@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jetpack Compose vs Kotlin Multiplatform: What's the Difference? — Android with Himanshu</title>
+  <meta name="description" content="Jetpack Compose, Kotlin Multiplatform and Compose Multiplatform explained simply: what each one is, how they fit together, and which one you should learn first." />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Compose vs Kotlin Multiplatform: What's the Difference?" />
+  <meta property="og:description" content="They aren't competitors. One draws your UI, the other shares your code. Here's how they fit together." />
+  <link rel="canonical" href="https://androidwithhimanshu.com/blog/compose-vs-kotlin-multiplatform" />
+  <meta property="og:url" content="https://androidwithhimanshu.com/blog/compose-vs-kotlin-multiplatform" />
+  <meta property="og:site_name" content="Android with Himanshu" />
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#0b0a12" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="article.css" />
+  <script>document.documentElement.classList.add("js")</script>
+</head>
+<body>
+  <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav" id="nav">
+    <div class="container nav__inner">
+      <a href="../index.html" class="logo" aria-label="Android with Himanshu, home">
+        <span class="logo__mark" aria-hidden="true">&lt;/&gt;</span>
+        <span class="logo__text">android<span class="dim">with</span>himanshu</span>
+      </a>
+      <nav class="nav__links" id="nav-links">
+        <a href="../index.html#paths">Find your path</a>
+        <a href="../index.html#courses">Courses</a>
+        <a href="../books/index.html">Books</a>
+        <a href="index.html">Blog</a>
+        <a href="../index.html#about">About</a>
+      </nav>
+      <div class="nav__cta">
+        <a href="https://ezylern.com" class="btn btn--ghost btn--sm">Student login</a>
+        <a href="../index.html#courses" class="btn btn--primary btn--sm">Start learning</a>
+      </div>
+      <button class="nav__toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ ARTICLE HEADER ============ -->
+    <header class="post-hero">
+      <div class="hero__glow" aria-hidden="true"></div>
+      <div class="container container--article">
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../index.html">Home</a><span>/</span><a href="index.html">Blog</a><span>/</span><span aria-current="page">Compose vs KMP</span>
+        </nav>
+        <div class="post-hero__tags">
+          <span class="tag tag--green">Jetpack Compose</span>
+          <span class="tag tag--purple">Kotlin Multiplatform</span>
+        </div>
+        <h1>Jetpack Compose vs Kotlin Multiplatform: <span class="grad">what's the difference?</span></h1>
+        <p class="post-hero__lead">
+          They sound like rivals, but they solve completely different problems. One draws your UI.
+          The other shares your code. And when you combine them, you get something even more powerful.
+        </p>
+        <div class="byline">
+          <img src="../me.webp" alt="" width="44" height="44" />
+          <div>
+            <strong>Himanshu Gaur</strong>
+            <span><time datetime="2026-10-16">16 Oct 2026</time> · <span id="read-time">5 min read</span></span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="container article-layout">
+      <!-- ============ TABLE OF CONTENTS ============ -->
+      <aside class="toc" aria-label="On this page">
+        <p class="toc__title">On this page</p>
+        <ol>
+          <li><a href="#tldr">The 30-second answer</a></li>
+          <li><a href="#compose">What is Jetpack Compose?</a></li>
+          <li><a href="#kmp">What is Kotlin Multiplatform?</a></li>
+          <li><a href="#cmp">Compose Multiplatform: the bridge</a></li>
+          <li><a href="#visual">See it visually</a></li>
+          <li><a href="#table">Side-by-side comparison</a></li>
+          <li><a href="#myths">4 common myths</a></li>
+          <li><a href="#choose">Which one should you use?</a></li>
+          <li><a href="#path">The learning path</a></li>
+        </ol>
+      </aside>
+
+      <!-- ============ ARTICLE BODY ============ -->
+      <article class="prose" id="article">
+
+        <section id="tldr">
+          <div class="tldr">
+            <p class="tldr__label">TL;DR</p>
+            <ul>
+              <li><strong>Jetpack Compose</strong> is a <em>UI toolkit</em>. It's how you build screens on Android.</li>
+              <li><strong>Kotlin Multiplatform (KMP)</strong> is a <em>code-sharing technology</em>. It lets you write business logic once and run it on Android, iOS, Desktop, Web and the server.</li>
+              <li><strong>Compose Multiplatform (CMP)</strong> is Compose running <em>on top of</em> KMP. It lets you share your UI too.</li>
+              <li>So the real question isn't "Compose <em>or</em> KMP". It's "how much do I want to share?"</li>
+            </ul>
+          </div>
+          <p>
+            If you're an Android developer, you've probably seen these three names thrown around together and wondered
+            whether you need to pick one. You don't. They're layers, not competitors. Let's go through each one,
+            then put them side by side.
+          </p>
+        </section>
+
+        <section id="compose">
+          <h2><span class="h-num">01</span> What is Jetpack Compose?</h2>
+          <p>
+            <strong>Jetpack Compose is Android's modern UI toolkit</strong>, built by Google. Instead of writing XML layouts
+            and wiring them up with <code>findViewById</code>, you describe your UI with Kotlin functions. When your state
+            changes, Compose redraws only the parts of the screen that need it.
+          </p>
+<pre class="codeblock" data-lang="kotlin" data-file="androidMain / GreetingScreen.kt"><code>@Composable
+fun GreetingScreen(name: String) {
+    var count by remember { mutableStateOf(0) }
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text("Hello, $name!")
+        Button(onClick = { count++ }) {
+            Text("Clicked $count times")
+        }
+    }
+}</code></pre>
+          <p>What Compose handles:</p>
+          <ul class="checks">
+            <li>Layouts, text, buttons, lists, animations, theming</li>
+            <li>Reacting to state changes and redrawing the UI</li>
+            <li>Navigation between screens (with Navigation Compose)</li>
+          </ul>
+          <p>What Compose <em>doesn't</em> handle on its own:</p>
+          <ul class="crosses">
+            <li>Networking, databases or business rules. That's your ViewModel, repository and data layers.</li>
+            <li>Running on iOS. Jetpack Compose by itself targets Android.</li>
+          </ul>
+          <div class="callout">
+            <span class="callout__icon" aria-hidden="true">💡</span>
+            <p><strong>Think of it this way:</strong> Compose answers the question <em>"how do I draw this screen?"</em>, and nothing more.</p>
+          </div>
+        </section>
+
+        <section id="kmp">
+          <h2><span class="h-num">02</span> What is Kotlin Multiplatform?</h2>
+          <p>
+            <strong>Kotlin Multiplatform is a technology from JetBrains for sharing Kotlin code across platforms.</strong>
+            You write code once in a <code>commonMain</code> source set, and the Kotlin compiler turns it into whatever each
+            platform needs: JVM bytecode for Android and the server, native binaries for iOS, and JavaScript or WebAssembly for the web.
+          </p>
+          <p>
+            Crucially, <strong>KMP is not a UI framework.</strong> Out of the box it's about sharing the <em>invisible</em> parts of
+            your app: models, networking, storage, validation and business logic. Each platform can keep its own native UI:
+            Compose on Android, SwiftUI on iOS.
+          </p>
+<pre class="codeblock" data-lang="kotlin" data-file="commonMain / GameRepository.kt"><code>// Written once. Used by Android, iOS, Desktop and even your server.
+class GameRepository(
+    private val api: GameApi,         // Ktor Client
+    private val cache: GameDatabase,  // SQLDelight
+) {
+    fun games(): Flow&lt;List&lt;Game&gt;&gt; = cache.gameQueries.all().asFlow().mapToList(Dispatchers.IO)
+
+    suspend fun refresh() {
+        val fresh = api.fetchGames()
+        cache.transaction { fresh.forEach(cache.gameQueries::upsert) }
+    }
+}</code></pre>
+          <p>
+            When you need something that only exists on one platform, KMP gives you <code>expect</code> and <code>actual</code>:
+            declare <em>what</em> you need in common code, then provide <em>how</em> on each platform.
+          </p>
+          <div class="code-pair">
+<pre class="codeblock" data-lang="kotlin" data-file="commonMain"><code>expect fun platformName(): String</code></pre>
+<pre class="codeblock" data-lang="kotlin" data-file="androidMain"><code>actual fun platformName(): String =
+    "Android ${Build.VERSION.SDK_INT}"</code></pre>
+<pre class="codeblock" data-lang="kotlin" data-file="iosMain"><code>actual fun platformName(): String =
+    UIDevice.currentDevice.systemName()</code></pre>
+          </div>
+          <p>
+            KMP has been stable since late 2023, and Google officially supports it for sharing business logic between Android
+            and iOS. Many Jetpack libraries you already use, like ViewModel, Room and DataStore, now work in common code too.
+          </p>
+          <div class="callout">
+            <span class="callout__icon" aria-hidden="true">💡</span>
+            <p><strong>Think of it this way:</strong> KMP answers <em>"how do I avoid writing the same logic twice?"</em></p>
+          </div>
+        </section>
+
+        <section id="cmp">
+          <h2><span class="h-num">03</span> Compose Multiplatform: the bridge between them</h2>
+          <p>
+            This is where most of the confusion comes from. <strong>Compose Multiplatform</strong> is JetBrains' version of the
+            Compose UI framework that runs on <strong>Android, iOS, Desktop and Web</strong>. It's built <em>on top of</em> Kotlin
+            Multiplatform, so it uses the same <code>commonMain</code> setup, and it uses the same <code>@Composable</code> APIs
+            you already know from Jetpack Compose.
+          </p>
+<pre class="codeblock" data-lang="kotlin" data-file="commonMain / GameCard.kt"><code>// The same composable now renders on Android, iPhone and Desktop.
+@Composable
+fun GameCard(game: Game, onFavorite: () -&gt; Unit) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(game.name, style = MaterialTheme.typography.titleMedium)
+            Spacer(Modifier.weight(1f))
+            IconButton(onClick = onFavorite) {
+                Icon(Icons.Default.FavoriteBorder, contentDescription = "Favorite")
+            }
+        }
+    }
+}</code></pre>
+          <p>
+            On Android, Compose Multiplatform uses Jetpack Compose under the hood. On other platforms, JetBrains renders the UI
+            with its own engine. iOS support has been stable since 2025, Desktop has been stable for a long time, and Web is still
+            maturing. And you can still drop into SwiftUI or UIKit on iOS for any screen that needs to feel 100% native.
+          </p>
+          <div class="callout callout--accent">
+            <span class="callout__icon" aria-hidden="true">🧩</span>
+            <p><strong>The formula:</strong> Kotlin Multiplatform <em>(share logic)</em> + Compose Multiplatform <em>(share UI)</em> = one Kotlin codebase for the whole app.</p>
+          </div>
+        </section>
+
+        <section id="visual">
+          <h2><span class="h-num">04</span> See it visually</h2>
+          <p>Here's what each approach actually shares. Tap a tab to compare.</p>
+          <div class="approach" id="approach">
+            <div class="approach__tabs" role="tablist" aria-label="Approaches">
+              <button role="tab" aria-selected="true" data-mode="compose">Jetpack Compose only</button>
+              <button role="tab" aria-selected="false" data-mode="kmp">KMP + native UI</button>
+              <button role="tab" aria-selected="false" data-mode="cmp">KMP + Compose Multiplatform</button>
+            </div>
+            <div class="approach__grid" data-mode="compose">
+              <div class="ap-col">
+                <span class="ap-head">Android</span>
+                <div class="ap-box ap-ui" data-share="cmp">Compose UI</div>
+                <div class="ap-box ap-logic" data-share="kmp cmp">Business logic</div>
+                <div class="ap-box ap-data" data-share="kmp cmp">Network &amp; DB</div>
+              </div>
+              <div class="ap-col">
+                <span class="ap-head">iOS</span>
+                <div class="ap-box ap-ui" data-share="cmp">SwiftUI</div>
+                <div class="ap-box ap-logic" data-share="kmp cmp">Business logic</div>
+                <div class="ap-box ap-data" data-share="kmp cmp">Network &amp; DB</div>
+              </div>
+              <div class="ap-col">
+                <span class="ap-head">Desktop</span>
+                <div class="ap-box ap-ui" data-share="cmp">Desktop UI</div>
+                <div class="ap-box ap-logic" data-share="kmp cmp">Business logic</div>
+                <div class="ap-box ap-data" data-share="kmp cmp">Network &amp; DB</div>
+              </div>
+            </div>
+            <p class="approach__caption" id="approach-caption"></p>
+          </div>
+        </section>
+
+        <section id="table">
+          <h2><span class="h-num">05</span> Side-by-side comparison</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th></th><th>Jetpack Compose</th><th>Kotlin Multiplatform</th><th>Compose Multiplatform</th></tr>
+              </thead>
+              <tbody>
+                <tr><th>What it is</th><td>UI toolkit</td><td>Code-sharing technology</td><td>Cross-platform UI framework</td></tr>
+                <tr><th>Built by</th><td>Google</td><td>JetBrains (Google-supported)</td><td>JetBrains</td></tr>
+                <tr><th>Shares</th><td>Nothing across platforms</td><td>Logic, data, networking</td><td>UI <em>and</em> logic (with KMP)</td></tr>
+                <tr><th>Platforms</th><td>Android</td><td>Android, iOS, Desktop, Web, Server</td><td>Android, iOS, Desktop, Web</td></tr>
+                <tr><th>UI on iOS</th><td>—</td><td>Native (SwiftUI / UIKit)</td><td>Shared Compose UI</td></tr>
+                <tr><th>Key libraries</th><td>Material 3, Navigation, Hilt</td><td>Ktor Client, SQLDelight, Koin</td><td>Same as KMP + Compose UI</td></tr>
+                <tr><th>Best for</th><td>Android-only apps</td><td>Native UI with shared logic</td><td>Maximum code reuse</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="myths">
+          <h2><span class="h-num">06</span> 4 common myths</h2>
+          <div class="myths">
+            <details open>
+              <summary><span class="myth-tag">Myth</span> "I have to choose between Compose and KMP."</summary>
+              <p>No. They work at different layers. Most KMP apps use Compose on Android anyway, and Compose Multiplatform is literally Compose on top of KMP.</p>
+            </details>
+            <details>
+              <summary><span class="myth-tag">Myth</span> "KMP means I must share my UI."</summary>
+              <p>Sharing UI is optional. Plenty of teams share only networking and business logic and keep a fully native SwiftUI app on iOS. You decide how much to share, screen by screen.</p>
+            </details>
+            <details>
+              <summary><span class="myth-tag">Myth</span> "I'd have to rewrite my Android app."</summary>
+              <p>You can adopt KMP gradually. Start by moving one module, like your models or API client, into <code>commonMain</code>. Your existing Android app keeps working the whole time.</p>
+            </details>
+            <details>
+              <summary><span class="myth-tag">Myth</span> "Compose Multiplatform is just another Flutter."</summary>
+              <p>Both share UI, but CMP uses Kotlin, compiles to native code, and talks directly to platform APIs. There's no bridge to cross and no new language to learn. Your Android skills transfer almost 1:1.</p>
+            </details>
+          </div>
+        </section>
+
+        <section id="choose">
+          <h2><span class="h-num">07</span> Which one should you use?</h2>
+          <div class="choose">
+            <div class="choose__card">
+              <span class="choose__emoji" aria-hidden="true">🤖</span>
+              <h3>Jetpack Compose only</h3>
+              <p>You're building an <strong>Android-only</strong> app, or you're still learning Android. Master this first. Everything else builds on it.</p>
+            </div>
+            <div class="choose__card">
+              <span class="choose__emoji" aria-hidden="true">🔗</span>
+              <h3>KMP + native UI</h3>
+              <p>You need iOS, but your iOS team wants <strong>fully native SwiftUI</strong>, or you're adding KMP to an existing app step by step.</p>
+            </div>
+            <div class="choose__card choose__card--best">
+              <span class="choose__emoji" aria-hidden="true">🚀</span>
+              <h3>KMP + Compose Multiplatform</h3>
+              <p>You're a small team or solo developer who wants to <strong>ship Android, iOS and Desktop</strong> from one codebase, fast.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="path">
+          <h2><span class="h-num">08</span> The learning path I recommend</h2>
+          <ol class="steps">
+            <li><strong>Get solid with Jetpack Compose and architecture.</strong> State, MVVM, clean layers, DI. These skills carry over to every platform.</li>
+            <li><strong>Learn KMP fundamentals.</strong> Source sets, <code>expect</code>/<code>actual</code>, and multiplatform libraries like Ktor Client, SQLDelight and Koin.</li>
+            <li><strong>Add Compose Multiplatform.</strong> Move your UI into <code>commonMain</code> and run the same app on Android, iOS and Desktop.</li>
+          </ol>
+
+          <div class="course-cta">
+            <div class="course-cta__glow" aria-hidden="true"></div>
+            <div class="course-cta__body">
+              <p class="kicker">Learn it hands-on</p>
+              <h3>Compose Multiplatform: Build Gamopedia</h3>
+              <p>Build a real gaming encyclopedia with KMP, Compose Multiplatform, Koin, Ktor Client and SQLDelight, and run it on Android, iOS and Desktop.</p>
+              <div class="course-cta__actions">
+                <a href="https://ezylern.com/course/gamopedia-build-a-cross-platform-gaming-app-with-compose-multiplatform" class="btn btn--primary">View the course →</a>
+                <a href="https://ezylern.com/course/android-architecture-mastery" class="btn btn--ghost">New to architecture? Start here</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="article-book">
+        <a class="book-plug" href="../books/index.html#book-compose">
+          <div class="book"><div class="cover cover--img"><img src="../books/covers/compose.webp" alt="Jetpack Compose Interview Questions &amp; Answers book cover" width="600" height="833" loading="lazy" decoding="async" /></div></div>
+          <span class="book-plug__text">
+            <span class="book-plug__label">Go deeper for interviews</span>
+            <span class="book-plug__title">Jetpack Compose Interview Questions &amp; Answers</span>
+            <span class="book-plug__desc">220 in-depth questions on recomposition, state, side effects and performance.</span>
+          </span>
+        </a>
+        </div>
+
+        <!-- Author -->
+        <aside class="author">
+          <img src="../me.webp" alt="Himanshu Gaur" width="72" height="72" loading="lazy" />
+          <div>
+            <p class="author__name">Written by Himanshu Gaur</p>
+            <p>Android developer building production apps with Kotlin, Kotlin Multiplatform and Ktor. I teach the stuff I wish someone had explained to me, with real code.</p>
+            <a href="../index.html#courses" class="link-arrow">See all courses →</a>
+          </div>
+        </aside>
+      </article>
+    </div>
+
+    <!-- ============ NEWSLETTER ============ -->
+    <section class="section cta" id="newsletter">
+      <div class="container">
+        <div class="cta__box reveal">
+          <div class="cta__glow" aria-hidden="true"></div>
+          <h2>Get one practical Kotlin tip every week.</h2>
+          <p class="sub">Short, useful, no spam. Plus early access to new courses.</p>
+          <!-- REPLACE: point this form at your email provider -->
+          <form class="signup" id="signup" action="#" method="post">
+            <label class="sr-only" for="email">Email address</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" required autocomplete="email" />
+            <button class="btn btn--primary" type="submit">Join free</button>
+          </form>
+          <p class="signup__msg" id="signup-msg" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <a href="../index.html" class="logo">
+        <span class="logo__mark" aria-hidden="true">&lt;/&gt;</span>
+        <span class="logo__text">android<span class="dim">with</span>himanshu</span>
+      </a>
+      <nav>
+        <a href="../index.html#courses">Courses</a>
+        <a href="../books/index.html">Books</a>
+        <a href="index.html">Blog</a>
+        <a href="../index.html#about">About</a>
+        <a href="https://ezylern.com">Student login</a>
+      </nav>
+      <p class="dim">© <span id="year"></span> Himanshu Gaur. Built with Kotlin on the brain.</p>
+    </div>
+  </footer>
+
+  <script src="article.js"></script>
+</body>
+</html>

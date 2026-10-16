@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Offline-First, Done Right: A Single Source of Truth with Room and Flow — Android with Himanshu</title>
+  <meta name="description" content="Build Android apps that keep working without internet: Room as the single source of truth, Flow for reactive UI, and WorkManager for background sync." />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Offline-First, Done Right: A Single Source of Truth with Room and Flow" />
+  <meta property="og:description" content="Build Android apps that keep working without internet: Room as the single source of truth, Flow for reactive UI, and WorkManager for background sync." />
+  <link rel="canonical" href="https://androidwithhimanshu.com/blog/offline-first-room-flow" />
+  <meta property="og:url" content="https://androidwithhimanshu.com/blog/offline-first-room-flow" />
+  <meta property="og:site_name" content="Android with Himanshu" />
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#0b0a12" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="article.css" />
+  <script>document.documentElement.classList.add("js")</script>
+</head>
+<body>
+  <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav" id="nav">
+    <div class="container nav__inner">
+      <a href="../index.html" class="logo" aria-label="Android with Himanshu, home">
+        <span class="logo__mark" aria-hidden="true">&lt;/&gt;</span>
+        <span class="logo__text">android<span class="dim">with</span>himanshu</span>
+      </a>
+      <nav class="nav__links" id="nav-links">
+        <a href="../index.html#paths">Find your path</a>
+        <a href="../index.html#courses">Courses</a>
+        <a href="../books/index.html">Books</a>
+        <a href="index.html">Blog</a>
+        <a href="../index.html#about">About</a>
+      </nav>
+      <div class="nav__cta">
+        <a href="https://ezylern.com" class="btn btn--ghost btn--sm">Student login</a>
+        <a href="../index.html#courses" class="btn btn--primary btn--sm">Start learning</a>
+      </div>
+      <button class="nav__toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ ARTICLE HEADER ============ -->
+    <header class="post-hero">
+      <div class="hero__glow" aria-hidden="true"></div>
+      <div class="container container--article">
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../index.html">Home</a><span>/</span><a href="index.html">Blog</a><span>/</span><span aria-current="page">Offline-first with Room</span>
+        </nav>
+        <div class="post-hero__tags">
+          <span class="tag tag--green">Android</span>
+          <span class="tag tag--orange">Offline-first</span>
+        </div>
+        <h1>Offline-first, done right: <span class="grad">a single source of truth</span> with Room and Flow</h1>
+        <p class="post-hero__lead">Your app shouldn't break the moment the Wi-Fi does. Here's the pattern that makes Android apps feel instant online and keeps them fully usable offline.</p>
+        <div class="byline">
+          <img src="../me.webp" alt="" width="44" height="44" />
+          <div>
+            <strong>Himanshu Gaur</strong>
+            <span><time datetime="2026-10-16">16 Oct 2026</time> · <span id="read-time">5 min read</span></span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="container article-layout">
+      <!-- ============ TABLE OF CONTENTS ============ -->
+      <aside class="toc" aria-label="On this page">
+        <p class="toc__title">On this page</p>
+        <ol>
+          <li><a href="#tldr">The 30-second answer</a></li>
+          <li><a href="#feel">Feel the difference</a></li>
+          <li><a href="#problem">Why online-first breaks</a></li>
+          <li><a href="#ssot">Single source of truth</a></li>
+          <li><a href="#read">Step 1: the read path</a></li>
+          <li><a href="#write">Step 2: the write path</a></li>
+          <li><a href="#sync">Step 3: sync with WorkManager</a></li>
+          <li><a href="#hard">Where it gets hard</a></li>
+          <li><a href="#checklist">Checklist</a></li>
+        </ol>
+      </aside>
+
+      <!-- ============ ARTICLE BODY ============ -->
+      <article class="prose" id="article">
+        <section id="tldr" data-toc="The 30-second answer">
+          <div class="tldr">
+            <p class="tldr__label">TL;DR</p>
+            <ul>
+              <li>In an offline-first app, <strong>the UI only ever reads from the local database</strong>, never straight from the network.</li>
+              <li><strong>Room + Flow</strong> make this easy: every write to Room automatically pushes fresh data to the screen.</li>
+              <li>The network's only job is to <strong>keep Room up to date</strong>: pull new data in, push local changes out.</li>
+              <li>Writes go to Room first and are marked <em>pending</em>. <strong>WorkManager</strong> syncs them when the connection comes back.</li>
+            </ul>
+          </div>
+          <p>
+            Open your app on a train, in a lift, or in airplane mode. Does it show a spinner forever? An error screen?
+            Do changes just disappear? If so, your app is <em>online-first</em>, and your users feel it every day.
+            Let's fix that with one idea: a <strong>single source of truth</strong>.
+          </p>
+        </section>
+
+        <section id="feel" data-toc="Feel the difference">
+          <h2><span class="h-num">01</span> Feel the difference first</h2>
+          <p>Below are two versions of the same task app. Go offline, add a few tasks, then reopen the app. Watch what happens to each one.</p>
+          <div class="demo" id="offline-demo">
+            <div class="demo__bar">
+              <span>Try it</span>
+              <button class="net-toggle" type="button" aria-pressed="false">📶 Online</button>
+            </div>
+            <div class="demo__phones">
+              <div class="phone" data-kind="online">
+                <p class="phone__label">Online-first</p>
+                <ul class="phone__list"></ul>
+                <p class="phone__toast" hidden></p>
+              </div>
+              <div class="phone" data-kind="offline">
+                <p class="phone__label">Offline-first</p>
+                <ul class="phone__list"></ul>
+              </div>
+            </div>
+            <div class="demo__actions">
+              <button class="btn btn--primary btn--sm" type="button" id="demo-add">+ Add task</button>
+              <button class="btn btn--ghost btn--sm" type="button" id="demo-reopen">↻ Reopen app</button>
+            </div>
+            <p class="demo__caption" aria-live="polite"></p>
+          </div>
+          <p>The offline-first app never waits for the network, so it never loses work. Here's how to build it.</p>
+        </section>
+
+        <section id="problem" data-toc="Why online-first breaks">
+          <h2><span class="h-num">02</span> Why online-first breaks</h2>
+          <p>Most apps start like this: the ViewModel calls the API, waits, and puts the result on screen.</p>
+<pre class="codeblock" data-lang="kotlin" data-file="❌ Online-first ViewModel"><code>class TasksViewModel(private val api: TaskApi) : ViewModel() {
+    var state by mutableStateOf&lt;UiState&gt;(UiState.Loading)
+        private set
+
+    init {
+        viewModelScope.launch {
+            state = try {
+                UiState.Success(api.fetchTasks())   // no network = no data
+            } catch (e: IOException) {
+                UiState.Error("Check your connection")
+            }
+        }
+    }
+}</code></pre>
+          <p>It looks clean, but it has three hidden problems:</p>
+          <ul class="crosses">
+            <li><strong>No network, no app.</strong> Every screen depends on a request succeeding.</li>
+            <li><strong>Two sources of truth.</strong> The screen holds one copy of the data, the server another, and maybe a cache a third. They drift apart.</li>
+            <li><strong>Lost writes.</strong> If saving a task fails, the user's work is simply gone.</li>
+          </ul>
+        </section>
+
+        <section id="ssot" data-toc="Single source of truth">
+          <h2><span class="h-num">03</span> The fix: a single source of truth</h2>
+          <p>
+            Flip the arrows around. The UI observes <strong>only</strong> the database. The network never talks to the UI. It only
+            reads from and writes to the database.
+          </p>
+          <div class="pipeline" aria-label="Data flow">
+            <div class="pipeline__node">UI <small>Compose, collecting a Flow</small></div>
+            <div class="pipeline__arrow"><span>observes</span></div>
+            <div class="pipeline__node pipeline__node--hot">Room database <small>the single source of truth</small></div>
+            <div class="pipeline__arrow"><span>kept up to date by</span></div>
+            <div class="pipeline__node">Repository + sync <small>pull from &amp; push to the API</small></div>
+            <div class="pipeline__arrow"><span>talks to</span></div>
+            <div class="pipeline__node">Network <small>Retrofit / Ktor Client</small></div>
+          </div>
+          <div class="callout callout--accent">
+            <span class="callout__icon" aria-hidden="true">🧭</span>
+            <p><strong>The rule:</strong> if data is on the screen, it came from Room. No exceptions.</p>
+          </div>
+        </section>
+
+        <section id="read" data-toc="Step 1: the read path">
+          <h2><span class="h-num">04</span> Step 1: the read path (Room + Flow)</h2>
+          <p>Start with an entity that knows whether it has been synced, and a DAO that returns a <code>Flow</code>.</p>
+<pre class="codeblock" data-lang="kotlin" data-file="data / TaskEntity.kt"><code>@Entity(tableName = "tasks")
+data class TaskEntity(
+    @PrimaryKey val id: String,          // generated on the device (UUID)
+    val title: String,
+    val isDone: Boolean,
+    val updatedAt: Long,
+    val pendingSync: Boolean = false,    // true = changed locally, not on the server yet
+)</code></pre>
+<pre class="codeblock" data-lang="kotlin" data-file="data / TaskDao.kt"><code>@Dao
+interface TaskDao {
+    @Query("SELECT * FROM tasks ORDER BY updatedAt DESC")
+    fun observeAll(): Flow&lt;List&lt;TaskEntity&gt;&gt;
+
+    @Query("SELECT * FROM tasks WHERE pendingSync = 1")
+    suspend fun pending(): List&lt;TaskEntity&gt;
+
+    @Upsert
+    suspend fun upsert(task: TaskEntity)
+
+    @Upsert
+    suspend fun upsertAll(tasks: List&lt;TaskEntity&gt;)
+}</code></pre>
+          <p>
+            Because <code>observeAll()</code> returns a <code>Flow</code>, Room re-emits the list <strong>every time the table changes</strong>,
+            whether the change came from the user, a background sync, or anything else. You never "refresh the UI" by hand.
+          </p>
+<pre class="codeblock" data-lang="kotlin" data-file="ui / TasksViewModel.kt"><code>class TasksViewModel(private val repo: TaskRepository) : ViewModel() {
+
+    val tasks: StateFlow&lt;List&lt;Task&gt;&gt; = repo.tasks
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    init {
+        // Try to fetch fresh data, but the screen never waits for it.
+        viewModelScope.launch { runCatching { repo.refresh() } }
+    }
+
+    fun add(title: String) = viewModelScope.launch { repo.addTask(title) }
+}</code></pre>
+          <p>Notice what's missing: no loading flag blocking the screen and no error state for "offline". Cached data shows instantly.</p>
+        </section>
+
+        <section id="write" data-toc="Step 2: the write path">
+          <h2><span class="h-num">05</span> Step 2: the write path (local first)</h2>
+          <p>When the user creates or edits something, write it to Room <strong>immediately</strong>, mark it as pending, and ask for a sync.</p>
+<pre class="codeblock" data-lang="kotlin" data-file="data / TaskRepository.kt"><code>class TaskRepository(
+    private val db: AppDatabase,
+    private val api: TaskApi,
+    private val sync: SyncScheduler,
+) {
+    private val dao = db.taskDao()
+
+    // READ: the only data the UI ever sees
+    val tasks: Flow&lt;List&lt;Task&gt;&gt; = dao.observeAll().map { rows -&gt; rows.map { it.toDomain() } }
+
+    // WRITE: save locally first, sync later
+    suspend fun addTask(title: String) {
+        dao.upsert(
+            TaskEntity(
+                id = UUID.randomUUID().toString(),
+                title = title,
+                isDone = false,
+                updatedAt = System.currentTimeMillis(),
+                pendingSync = true,
+            )
+        )
+        sync.requestSync()
+    }
+
+    // PULL: bring server data into Room, but never overwrite unsynced local edits
+    suspend fun refresh() {
+        val remote = api.fetchTasks()
+        db.withTransaction {
+            val pendingIds = dao.pending().map { it.id }.toSet()
+            dao.upsertAll(remote.filter { it.id !in pendingIds }.map { it.toEntity() })
+        }
+    }
+
+    // PUSH: send pending changes, then mark them as synced
+    suspend fun pushPending() {
+        dao.pending().forEach { task -&gt;
+            api.upsertTask(task.toDto())
+            dao.upsert(task.copy(pendingSync = false))
+        }
+    }
+}</code></pre>
+          <div class="callout">
+            <span class="callout__icon" aria-hidden="true">⚠️</span>
+            <p><strong>The classic bug:</strong> a refresh that blindly overwrites rows will wipe out edits the user made offline. Always skip rows that are still <code>pendingSync</code>.</p>
+          </div>
+          <p>
+            Generating IDs on the device (UUIDs) matters too: the task needs an identity <em>before</em> the server has ever seen it,
+            so the UI and later updates can refer to it.
+          </p>
+        </section>
+
+        <section id="sync" data-toc="Step 3: sync with WorkManager">
+          <h2><span class="h-num">06</span> Step 3: sync in the background with WorkManager</h2>
+          <p>
+            Pending changes need to reach the server even if the user closes the app. That's exactly what WorkManager is for:
+            it runs your work when constraints are met (like "has network") and retries with backoff if it fails.
+          </p>
+<pre class="codeblock" data-lang="kotlin" data-file="sync / SyncWorker.kt"><code>@HiltWorker
+class SyncWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
+    private val repo: TaskRepository,
+) : CoroutineWorker(context, params) {
+
+    override suspend fun doWork(): Result = try {
+        repo.pushPending()
+        repo.refresh()
+        Result.success()
+    } catch (e: IOException) {
+        Result.retry()   // network hiccup: WorkManager tries again later
+    }
+}</code></pre>
+<pre class="codeblock" data-lang="kotlin" data-file="sync / SyncScheduler.kt"><code>class SyncScheduler(private val workManager: WorkManager) {
+
+    fun requestSync() {
+        val request = OneTimeWorkRequestBuilder&lt;SyncWorker&gt;()
+            .setConstraints(
+                Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build()
+            )
+            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
+            .build()
+
+        // One sync chain at a time; new requests queue up behind a running one
+        workManager.enqueueUniqueWork("task-sync", ExistingWorkPolicy.APPEND_OR_REPLACE, request)
+    }
+}</code></pre>
+          <p>
+            That's the whole loop: the user writes to Room, Room updates the UI instantly, WorkManager waits for a connection,
+            pushes pending rows, pulls fresh data back into Room, and the UI updates again by itself.
+          </p>
+        </section>
+
+        <section id="hard" data-toc="Where it gets hard">
+          <h2><span class="h-num">07</span> Where it gets hard</h2>
+          <p>The pattern above is the foundation. Real apps hit these next, and each one needs a deliberate design:</p>
+          <div class="myths">
+            <details open>
+              <summary><span class="myth-tag">Conflicts</span> Two devices edit the same task offline.</summary>
+              <p>Who wins? Timestamps from device clocks can't be trusted. The usual answer is a <strong>server-controlled version number</strong>: each update says which version it was based on, so the server can detect stale writes.</p>
+            </details>
+            <details>
+              <summary><span class="myth-tag">Deletes</span> A task is deleted on one device.</summary>
+              <p>If you simply remove the row, other devices never find out. Instead, keep a <strong>tombstone</strong> (a soft-delete flag) so the deletion itself can be synced.</p>
+            </details>
+            <details>
+              <summary><span class="myth-tag">Scale</span> Downloading everything on every sync.</summary>
+              <p>Fine for 50 tasks, painful for 50,000. Use a <strong>cursor</strong>: the client remembers the last change it saw and asks only for what's new, like <code>GET /sync?cursor=100</code>.</p>
+            </details>
+            <details>
+              <summary><span class="myth-tag">Races</span> The user edits a task while it's being pushed.</summary>
+              <p>Marking it synced after the push could hide the newer edit. Compare <code>updatedAt</code> or the version before clearing <code>pendingSync</code>.</p>
+            </details>
+          </div>
+        </section>
+
+        <section id="checklist" data-toc="Checklist">
+          <h2><span class="h-num">08</span> Your offline-first checklist</h2>
+          <ul class="checks">
+            <li>The UI observes Room through a <code>Flow</code>, never the API directly</li>
+            <li>Writes go to Room first, with a <code>pendingSync</code> flag</li>
+            <li>IDs are generated on the device</li>
+            <li>Refreshes never overwrite pending local changes</li>
+            <li>WorkManager pushes changes with a network constraint and backoff</li>
+            <li>You have a plan for conflicts, deletes and incremental sync</li>
+          </ul>
+
+          <div class="course-cta">
+            <div class="course-cta__glow" aria-hidden="true"></div>
+            <div class="course-cta__body">
+              <p class="kicker">Build the full system</p>
+              <h3>Offline-First Android App</h3>
+              <p>Go all the way: server versions, change logs, tombstones, cursor-based sync and multi-device conflicts, with your own Ktor backend instead of Firebase.</p>
+              <div class="course-cta__actions">
+                <a href="https://ezylern.com/course/offline-first-android-development" class="btn btn--primary">View the course →</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="article-book">
+        <a class="book-plug" href="../books/index.html#book-coroutines">
+          <div class="book"><div class="cover cover--img"><img src="../books/covers/coroutines.webp" alt="Kotlin Coroutines &amp; Flow Interview Questions &amp; Answers book cover" width="600" height="833" loading="lazy" decoding="async" /></div></div>
+          <span class="book-plug__text">
+            <span class="book-plug__label">Go deeper for interviews</span>
+            <span class="book-plug__title">Kotlin Coroutines &amp; Flow Interview Questions &amp; Answers</span>
+            <span class="book-plug__desc">300 in-depth questions on structured concurrency, cancellation, Flow and testing.</span>
+          </span>
+        </a>
+        </div>
+
+        <!-- Author -->
+        <aside class="author">
+          <img src="../me.webp" alt="Himanshu Gaur" width="72" height="72" loading="lazy" />
+          <div>
+            <p class="author__name">Written by Himanshu Gaur</p>
+            <p>Android developer building production apps with Kotlin, Kotlin Multiplatform and Ktor. I teach the stuff I wish someone had explained to me, with real code.</p>
+            <a href="index.html" class="link-arrow">More articles →</a>
+          </div>
+        </aside>
+      </article>
+    </div>
+
+    <!-- ============ NEWSLETTER ============ -->
+    <section class="section cta" id="newsletter">
+      <div class="container">
+        <div class="cta__box reveal">
+          <div class="cta__glow" aria-hidden="true"></div>
+          <h2>Get one practical Kotlin tip every week.</h2>
+          <p class="sub">Short, useful, no spam. Plus early access to new courses.</p>
+          <!-- REPLACE: point this form at your email provider -->
+          <form class="signup" id="signup" action="#" method="post">
+            <label class="sr-only" for="email">Email address</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" required autocomplete="email" />
+            <button class="btn btn--primary" type="submit">Join free</button>
+          </form>
+          <p class="signup__msg" id="signup-msg" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <a href="../index.html" class="logo">
+        <span class="logo__mark" aria-hidden="true">&lt;/&gt;</span>
+        <span class="logo__text">android<span class="dim">with</span>himanshu</span>
+      </a>
+      <nav>
+        <a href="../index.html#courses">Courses</a>
+        <a href="../books/index.html">Books</a>
+        <a href="index.html">Blog</a>
+        <a href="../index.html#about">About</a>
+        <a href="https://ezylern.com">Student login</a>
+      </nav>
+      <p class="dim">© <span id="year"></span> Himanshu Gaur. Built with Kotlin on the brain.</p>
+    </div>
+  </footer>
+
+  <script src="article.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+# Settings for Apache hosting (GoDaddy cPanel). Other hosts ignore this file.
+RewriteEngine On
+
+# Always use https:// and the main address without "www."
+RewriteCond %{HTTPS} off [OR]
+RewriteCond %{HTTP_HOST} ^www\. [NC]
+RewriteRule ^ https://androidwithhimanshu.com%{REQUEST_URI} [L,R=301]
+
+# Clean URLs: /blog/first-ktor-api serves /blog/first-ktor-api.html
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.+)$ $1.html [L]

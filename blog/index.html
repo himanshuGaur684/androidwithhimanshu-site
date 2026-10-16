@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Blog — Android with Himanshu</title>
+  <meta name="description" content="Practical deep dives on Android architecture, Kotlin Multiplatform, Compose Multiplatform and Ktor." />
+  <link rel="canonical" href="https://androidwithhimanshu.com/blog/" />
+  <meta property="og:url" content="https://androidwithhimanshu.com/blog/" />
+  <meta property="og:site_name" content="Android with Himanshu" />
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#0b0a12" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="blog.css" />
+  <script>document.documentElement.classList.add("js")</script>
+</head>
+<body>
+  <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav" id="nav">
+    <div class="container nav__inner">
+      <a href="../index.html" class="logo" aria-label="Android with Himanshu, home">
+        <span class="logo__mark" aria-hidden="true">&lt;/&gt;</span>
+        <span class="logo__text">android<span class="dim">with</span>himanshu</span>
+      </a>
+      <nav class="nav__links" id="nav-links">
+        <a href="../index.html#paths">Find your path</a>
+        <a href="../index.html#courses">Courses</a>
+        <a href="../books/index.html">Books</a>
+        <a href="index.html" aria-current="page">Blog</a>
+        <a href="../index.html#about">About</a>
+      </nav>
+      <div class="nav__cta">
+        <a href="https://ezylern.com" class="btn btn--ghost btn--sm">Student login</a>
+        <a href="../index.html#courses" class="btn btn--primary btn--sm">Start learning</a>
+      </div>
+      <button class="nav__toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ HEADER ============ -->
+    <header class="blog-hero">
+      <div class="hero__glow" aria-hidden="true"></div>
+      <div class="hero__grid" aria-hidden="true"></div>
+      <div class="container">
+        <p class="kicker">The blog</p>
+        <h1>Deep dives you won't find <span class="grad">in the docs.</span></h1>
+        <p class="lead">Android architecture, offline-first apps, Kotlin Multiplatform and Ktor, explained with real code and no fluff.</p>
+
+        <div class="blog-tools">
+          <label class="search">
+            <span class="sr-only">Search articles</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm10 2-4.35-4.35"/></svg>
+            <input id="search" type="search" placeholder="Search articles…" autocomplete="off" />
+            <kbd>/</kbd>
+          </label>
+          <div class="chips" role="group" aria-label="Filter by topic">
+            <button class="chip is-active" data-filter="all" aria-pressed="true">All</button>
+            <button class="chip" data-filter="android" aria-pressed="false">Android</button>
+            <button class="chip" data-filter="kmp" aria-pressed="false">Kotlin Multiplatform</button>
+            <button class="chip" data-filter="compose" aria-pressed="false">Compose</button>
+            <button class="chip" data-filter="ktor" aria-pressed="false">Ktor</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ============ ARTICLES ============ -->
+    <section class="section blog-list">
+      <div class="container">
+        <!--
+          TO ADD A NEW ARTICLE: copy one <a class="post …"> block below, put it at the top of the grid,
+          and update href, data-tags, data-date, the art text, title, excerpt and read time.
+          The newest article automatically becomes the featured one.
+        -->
+        <div class="posts posts--list" id="posts">
+          <a class="post post--featured reveal"
+             href="compose-vs-kotlin-multiplatform.html"
+             data-tags="kmp compose android"
+             data-date="2026-10-16">
+            <div class="post__art post__art--a" aria-hidden="true"><code>Compose ≠ KMP</code></div>
+            <div class="post__body">
+              <div class="post__meta">
+                <span class="tag tag--purple">KMP</span>
+                <span class="tag tag--green">Compose</span>
+                <time datetime="2026-10-16">16 Oct 2026</time> · 5 min read
+              </div>
+              <h2 class="post__title">Jetpack Compose vs Kotlin Multiplatform: what's the difference?</h2>
+              <p>One draws your UI, the other shares your code. Learn what Jetpack Compose, KMP and Compose Multiplatform each do, how they fit together, and which one to learn first.</p>
+              <span class="link-arrow">Read article →</span>
+            </div>
+          </a>
+
+          <a class="post reveal" style="--d: .04s"
+             href="offline-first-room-flow.html"
+             data-tags="android"
+             data-date="2026-10-16">
+            <div class="post__art post__art--b" aria-hidden="true"><code>Flow&lt;List&lt;T&gt;&gt;</code></div>
+            <div class="post__body">
+              <div class="post__meta"><span class="tag tag--green">Android</span> <time datetime="2026-10-16">16 Oct 2026</time> · 5 min read</div>
+              <h2 class="post__title">Offline-first, done right: a single source of truth with Room and Flow</h2>
+              <p>Make Room the only thing your UI reads, write locally first, and sync in the background with WorkManager.</p>
+              <span class="link-arrow">Read article →</span>
+            </div>
+          </a>
+
+          <a class="post reveal" style="--d: .08s"
+             href="first-ktor-api.html"
+             data-tags="ktor"
+             data-date="2026-10-16">
+            <div class="post__art post__art--c" aria-hidden="true"><code>routing { }</code></div>
+            <div class="post__body">
+              <div class="post__meta"><span class="tag tag--orange">Ktor</span> <time datetime="2026-10-16">16 Oct 2026</time> · 5 min read</div>
+              <h2 class="post__title">Your first Ktor API: from an empty project to a live endpoint</h2>
+              <p>Build, test and ship a real REST API in Kotlin: routing, JSON, error handling, tests and Docker.</p>
+              <span class="link-arrow">Read article →</span>
+            </div>
+          </a>
+
+          <a class="post reveal" style="--d: .12s"
+             href="ktor-client-vs-retrofit.html"
+             data-tags="kmp ktor android"
+             data-date="2026-10-16">
+            <div class="post__art post__art--d" aria-hidden="true"><code>HttpClient { }</code></div>
+            <div class="post__body">
+              <div class="post__meta"><span class="tag tag--purple">KMP</span> <span class="tag tag--orange">Ktor</span> <time datetime="2026-10-16">16 Oct 2026</time> · 5 min read</div>
+              <h2 class="post__title">Ktor Client vs Retrofit: what changes when you go multiplatform</h2>
+              <p>Why Retrofit can't run on iOS, how every Retrofit concept maps to Ktor, and how to migrate step by step.</p>
+              <span class="link-arrow">Read article →</span>
+            </div>
+          </a>
+        </div>
+
+        <div class="blog-books reveal">
+          <a class="book-plug" href="../books/index.html#book-kotlin">
+          <div class="book"><div class="cover cover--img"><img src="../books/covers/kotlin.webp" alt="Kotlin Interview Questions &amp; Answers book cover" width="600" height="833" loading="lazy" decoding="async" /></div></div>
+          <span class="book-plug__text">
+            <span class="book-plug__label">From the books</span>
+            <span class="book-plug__title">Kotlin Interview Questions &amp; Answers</span>
+            <span class="book-plug__desc">140+ real questions with code examples, from junior to senior.</span>
+          </span>
+        </a>
+          <a href="../books/index.html" class="btn btn--ghost">See all 4 interview books →</a>
+        </div>
+
+        <div class="empty" id="empty" hidden>
+          <p class="empty__title">No articles match that yet.</p>
+          <p>Try another topic, or <button type="button" class="linklike" id="reset">clear the filters</button>.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============ NEWSLETTER ============ -->
+    <section class="section cta" id="newsletter">
+      <div class="container">
+        <div class="cta__box reveal">
+          <div class="cta__glow" aria-hidden="true"></div>
+          <h2>Get new articles in your inbox.</h2>
+          <p class="sub">One practical Kotlin tip every week, plus early access to new courses. No spam.</p>
+          <!-- REPLACE: point this form at your email provider -->
+          <form class="signup" id="signup" action="#" method="post">
+            <label class="sr-only" for="email">Email address</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" required autocomplete="email" />
+            <button class="btn btn--primary" type="submit">Join free</button>
+          </form>
+          <p class="signup__msg" id="signup-msg" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <a href="../index.html" class="logo">
+        <span class="logo__mark" aria-hidden="true">&lt;/&gt;</span>
+        <span class="logo__text">android<span class="dim">with</span>himanshu</span>
+      </a>
+      <nav>
+        <a href="../index.html#courses">Courses</a>
+        <a href="../books/index.html">Books</a>
+        <a href="index.html">Blog</a>
+        <a href="../index.html#about">About</a>
+        <a href="https://ezylern.com">Student login</a>
+      </nav>
+      <p class="dim">© <span id="year"></span> Himanshu Gaur. Built with Kotlin on the brain.</p>
+    </div>
+  </footer>
+
+  <script src="blog.js"></script>
+</body>
+</html>

@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Your First Ktor API: From an Empty Project to a Live Endpoint — Android with Himanshu</title>
+  <meta name="description" content="A step-by-step guide for Android developers to build, test and deploy a REST API in Kotlin with Ktor: routing, JSON, error handling, testing and Docker." />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Your First Ktor API: From an Empty Project to a Live Endpoint" />
+  <meta property="og:description" content="A step-by-step guide for Android developers to build, test and deploy a REST API in Kotlin with Ktor: routing, JSON, error handling, testing and Docker." />
+  <link rel="canonical" href="https://androidwithhimanshu.com/blog/first-ktor-api" />
+  <meta property="og:url" content="https://androidwithhimanshu.com/blog/first-ktor-api" />
+  <meta property="og:site_name" content="Android with Himanshu" />
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#0b0a12" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="article.css" />
+  <script>document.documentElement.classList.add("js")</script>
+</head>
+<body>
+  <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav" id="nav">
+    <div class="container nav__inner">
+      <a href="../index.html" class="logo" aria-label="Android with Himanshu, home">
+        <span class="logo__mark" aria-hidden="true">&lt;/&gt;</span>
+        <span class="logo__text">android<span class="dim">with</span>himanshu</span>
+      </a>
+      <nav class="nav__links" id="nav-links">
+        <a href="../index.html#paths">Find your path</a>
+        <a href="../index.html#courses">Courses</a>
+        <a href="../books/index.html">Books</a>
+        <a href="index.html">Blog</a>
+        <a href="../index.html#about">About</a>
+      </nav>
+      <div class="nav__cta">
+        <a href="https://ezylern.com" class="btn btn--ghost btn--sm">Student login</a>
+        <a href="../index.html#courses" class="btn btn--primary btn--sm">Start learning</a>
+      </div>
+      <button class="nav__toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ ARTICLE HEADER ============ -->
+    <header class="post-hero">
+      <div class="hero__glow" aria-hidden="true"></div>
+      <div class="container container--article">
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../index.html">Home</a><span>/</span><a href="index.html">Blog</a><span>/</span><span aria-current="page">Your first Ktor API</span>
+        </nav>
+        <div class="post-hero__tags">
+          <span class="tag tag--orange">Ktor</span>
+          <span class="tag tag--purple">Backend</span>
+        </div>
+        <h1>Your first Ktor API: <span class="grad">from an empty project</span> to a live endpoint</h1>
+        <p class="post-hero__lead">You already know Kotlin, coroutines and serialization. That's most of what you need to build your own backend. Let's build, test and ship a real REST API step by step.</p>
+        <div class="byline">
+          <img src="../me.webp" alt="" width="44" height="44" />
+          <div>
+            <strong>Himanshu Gaur</strong>
+            <span><time datetime="2026-10-16">16 Oct 2026</time> · <span id="read-time">5 min read</span></span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="container article-layout">
+      <!-- ============ TABLE OF CONTENTS ============ -->
+      <aside class="toc" aria-label="On this page">
+        <p class="toc__title">On this page</p>
+        <ol>
+          <li><a href="#tldr">The 30-second answer</a></li>
+          <li><a href="#create">Create the project</a></li>
+          <li><a href="#server">Start the server</a></li>
+          <li><a href="#model">Models and storage</a></li>
+          <li><a href="#routes">Add the routes</a></li>
+          <li><a href="#try">Try the API</a></li>
+          <li><a href="#errors">Handle errors</a></li>
+          <li><a href="#test">Test it</a></li>
+          <li><a href="#deploy">Ship it</a></li>
+          <li><a href="#next">What's next</a></li>
+        </ol>
+      </aside>
+
+      <!-- ============ ARTICLE BODY ============ -->
+      <article class="prose" id="article">
+        <section id="tldr" data-toc="The 30-second answer">
+          <div class="tldr">
+            <p class="tldr__label">TL;DR</p>
+            <ul>
+              <li><strong>Ktor</strong> is JetBrains' Kotlin framework for building servers. If you can write a ViewModel, you can write a Ktor API.</li>
+              <li>You'll build a small <strong>Tasks REST API</strong>: list, read, create and delete, with JSON in and out.</li>
+              <li>Then you'll <strong>test it</strong>, handle errors properly, and <strong>package it in Docker</strong> so it can run anywhere.</li>
+              <li>Same language, same coroutines, same <code>kotlinx.serialization</code> you already use on Android.</li>
+            </ul>
+          </div>
+          <p>
+            As a mobile developer, you've probably waited on a backend team, or built an app on top of an API you didn't control.
+            The good news: you don't need to learn Node or Python to build your own. Your Kotlin skills already cover most of it.
+          </p>
+        </section>
+
+        <section id="create" data-toc="Create the project">
+          <h2><span class="h-num">01</span> Create the project</h2>
+          <p>
+            The quickest start is the project generator at <a href="https://start.ktor.io" target="_blank" rel="noopener">start.ktor.io</a>
+            (also built into IntelliJ IDEA). Pick these plugins:
+          </p>
+          <ul class="checks">
+            <li><strong>Routing</strong>: map URLs to code</li>
+            <li><strong>Content Negotiation</strong> + <strong>kotlinx.serialization</strong>: JSON in and out</li>
+            <li><strong>Status Pages</strong>: clean error responses</li>
+          </ul>
+          <p>Your <code>build.gradle.kts</code> will look roughly like this:</p>
+<pre class="codeblock" data-lang="kotlin" data-file="build.gradle.kts"><code>plugins {
+    kotlin("jvm") version "2.2.0"
+    kotlin("plugin.serialization") version "2.2.0"
+    id("io.ktor.plugin") version "3.2.0"
+}
+
+application {
+    mainClass.set("com.example.ApplicationKt")
+}
+
+val ktor = "3.2.0"
+
+dependencies {
+    implementation("io.ktor:ktor-server-core:$ktor")
+    implementation("io.ktor:ktor-server-netty:$ktor")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktor")
+    implementation("io.ktor:ktor-server-status-pages:$ktor")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor")
+    implementation("ch.qos.logback:logback-classic:1.5.18")
+
+    testImplementation("io.ktor:ktor-server-test-host:$ktor")
+    testImplementation("io.ktor:ktor-client-content-negotiation:$ktor")
+    testImplementation(kotlin("test"))
+}</code></pre>
+          <div class="callout">
+            <span class="callout__icon" aria-hidden="true">📌</span>
+            <p>Version numbers move fast. Use whatever the generator gives you; the code in this article works the same way across Ktor 3.x.</p>
+          </div>
+        </section>
+
+        <section id="server" data-toc="Start the server">
+          <h2><span class="h-num">02</span> Start the server</h2>
+          <p>A Ktor app is just a <code>main</code> function that starts an engine (Netty here) and installs a <strong>module</strong>: an extension function on <code>Application</code> where you configure everything.</p>
+<pre class="codeblock" data-lang="kotlin" data-file="Application.kt"><code>fun main() {
+    // Cloud platforms tell you which port to use through the PORT variable
+    val port = System.getenv("PORT")?.toInt() ?: 8080
+    embeddedServer(Netty, port = port, module = Application::module)
+        .start(wait = true)
+}
+
+fun Application.module() {
+    install(ContentNegotiation) { json() }
+    configureErrors()
+    configureRouting(TaskRepository())
+}</code></pre>
+          <p>Run it, open <code>http://localhost:8080</code>, and… nothing yet. Let's add routes.</p>
+        </section>
+
+        <section id="model" data-toc="Models and storage">
+          <h2><span class="h-num">03</span> Models and a simple store</h2>
+          <p>
+            Models are plain <code>@Serializable</code> data classes, exactly like on Android. For now we'll keep tasks in memory.
+            Swapping in a real database later only changes this one class.
+          </p>
+<pre class="codeblock" data-lang="kotlin" data-file="Task.kt"><code>@Serializable
+data class Task(val id: String, val title: String, val done: Boolean = false)
+
+@Serializable
+data class NewTask(val title: String)</code></pre>
+<pre class="codeblock" data-lang="kotlin" data-file="TaskRepository.kt"><code>class TaskRepository {
+    private val tasks = ConcurrentHashMap&lt;String, Task&gt;()
+    private val nextId = AtomicInteger(1)
+
+    fun all(): List&lt;Task&gt; = tasks.values.sortedBy { it.id.toInt() }
+
+    fun find(id: String): Task? = tasks[id]
+
+    fun add(title: String): Task {
+        val task = Task(id = nextId.getAndIncrement().toString(), title = title)
+        tasks[task.id] = task
+        return task
+    }
+
+    fun delete(id: String): Boolean = tasks.remove(id) != null
+}</code></pre>
+          <p>
+            Why <code>ConcurrentHashMap</code>? A server handles many requests at the same time, on different threads.
+            A plain <code>mutableMapOf()</code> isn't safe for that.
+          </p>
+        </section>
+
+        <section id="routes" data-toc="Add the routes">
+          <h2><span class="h-num">04</span> Add the routes</h2>
+          <p>Routing reads almost like a description of your API. Each handler is a suspend lambda with access to the <code>call</code>: the request coming in and the response going out.</p>
+<pre class="codeblock" data-lang="kotlin" data-file="Routing.kt"><code>fun Application.configureRouting(repo: TaskRepository) {
+    routing {
+        get("/") {
+            call.respondText("Hello from Ktor 👋")
+        }
+
+        route("/tasks") {
+            get {
+                call.respond(repo.all())
+            }
+
+            get("/{id}") {
+                val task = repo.find(call.parameters["id"]!!)
+                    ?: return@get call.respond(HttpStatusCode.NotFound)
+                call.respond(task)
+            }
+
+            post {
+                val body = call.receive&lt;NewTask&gt;()
+                if (body.title.isBlank()) {
+                    return@post call.respond(HttpStatusCode.BadRequest, mapOf("error" to "title is required"))
+                }
+                call.respond(HttpStatusCode.Created, repo.add(body.title.trim()))
+            }
+
+            delete("/{id}") {
+                val removed = repo.delete(call.parameters["id"]!!)
+                call.respond(if (removed) HttpStatusCode.NoContent else HttpStatusCode.NotFound)
+            }
+        }
+    }
+}</code></pre>
+          <p>
+            <code>call.receive&lt;NewTask&gt;()</code> turns the JSON body into a Kotlin object, and <code>call.respond(task)</code> turns it back into JSON.
+            That's Content Negotiation doing its job. Notice the status codes too: <strong>201</strong> for created,
+            <strong>204</strong> for a successful delete, <strong>404</strong> when something doesn't exist. Good APIs say what happened.
+          </p>
+        </section>
+
+        <section id="try" data-toc="Try the API">
+          <h2><span class="h-num">05</span> Try the API</h2>
+          <p>Here's exactly how your API will behave. Send some requests. The responses below are simulated in your browser, but they match the code above.</p>
+          <div class="playground" id="playground">
+            <div class="pg__controls">
+              <label>Title for POST<input id="pg-title" type="text" value="Write my first API" autocomplete="off" /></label>
+              <label>Task id<input id="pg-id" type="text" value="1" inputmode="numeric" autocomplete="off" /></label>
+              <button class="pg__btn" type="button" data-action="list"><b class="m-get">GET</b>/tasks</button>
+              <button class="pg__btn" type="button" data-action="get"><b class="m-get">GET</b>/tasks/{id}</button>
+              <button class="pg__btn" type="button" data-action="post"><b class="m-post">POST</b>/tasks</button>
+              <button class="pg__btn" type="button" data-action="delete"><b class="m-del">DELETE</b>/tasks/{id}</button>
+            </div>
+            <div class="pg__out" aria-live="polite">
+              <pre class="pg__req"></pre>
+              <div class="pg__status"></div>
+              <pre class="pg__body"></pre>
+            </div>
+            <p class="pg__note">Tip: try a POST with an empty title, or GET a task you just deleted.</p>
+          </div>
+          <p>When your real server is running, the same requests work from a terminal:</p>
+<pre class="codeblock" data-lang="bash" data-file="Terminal"><code># create a task
+curl -X POST http://localhost:8080/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Write my first API"}'
+
+# list all tasks
+curl http://localhost:8080/tasks</code></pre>
+        </section>
+
+        <section id="errors" data-toc="Handle errors">
+          <h2><span class="h-num">06</span> Handle errors like a pro</h2>
+          <p>
+            What happens if someone sends broken JSON? By default, the client gets a vague error. The <strong>Status Pages</strong>
+            plugin lets you turn exceptions into clear, consistent responses in one place.
+          </p>
+<pre class="codeblock" data-lang="kotlin" data-file="Errors.kt"><code>fun Application.configureErrors() {
+    install(StatusPages) {
+        exception&lt;BadRequestException&gt; { call, cause -&gt;
+            call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Invalid request body"))
+        }
+        exception&lt;Throwable&gt; { call, cause -&gt;
+            call.application.log.error("Unhandled error", cause)
+            call.respond(HttpStatusCode.InternalServerError, mapOf("error" to "Something went wrong"))
+        }
+    }
+}</code></pre>
+          <div class="callout">
+            <span class="callout__icon" aria-hidden="true">🔒</span>
+            <p><strong>Never send stack traces to clients.</strong> Log the details on the server, and return a short, safe message.</p>
+          </div>
+        </section>
+
+        <section id="test" data-toc="Test it">
+          <h2><span class="h-num">07</span> Test it without starting a server</h2>
+          <p><code>testApplication</code> runs your whole module in memory, so tests are fast and need no network.</p>
+<pre class="codeblock" data-lang="kotlin" data-file="TasksTest.kt"><code>import io.ktor.client.plugins.contentnegotiation.ContentNegotiation as ClientContentNegotiation
+
+class TasksTest {
+
+    @Test
+    fun `creating a task returns 201`() = testApplication {
+        application { module() }
+        val client = createClient {
+            install(ClientContentNegotiation) { json() }
+        }
+
+        val response = client.post("/tasks") {
+            contentType(ContentType.Application.Json)
+            setBody(NewTask("Write tests"))
+        }
+
+        assertEquals(HttpStatusCode.Created, response.status)
+        assertEquals("Write tests", response.body&lt;Task&gt;().title)
+    }
+
+    @Test
+    fun `blank title returns 400`() = testApplication {
+        application { module() }
+        val response = client.post("/tasks") {
+            contentType(ContentType.Application.Json)
+            setBody("""{"title":"  "}""")
+        }
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+    }
+}</code></pre>
+        </section>
+
+        <section id="deploy" data-toc="Ship it">
+          <h2><span class="h-num">08</span> Ship it: one jar, one Docker image</h2>
+          <p>The Ktor Gradle plugin can bundle your server and all its dependencies into a single runnable "fat jar":</p>
+<pre class="codeblock" data-lang="bash" data-file="Terminal"><code>./gradlew buildFatJar
+java -jar build/libs/*-all.jar</code></pre>
+          <p>Wrap it in Docker and it runs the same on your laptop and in the cloud:</p>
+<pre class="codeblock" data-lang="docker" data-file="Dockerfile"><code># Stage 1: build the fat jar
+FROM gradle:8-jdk21 AS build
+WORKDIR /app
+COPY . .
+RUN gradle buildFatJar --no-daemon
+
+# Stage 2: run it on a small Java runtime
+FROM eclipse-temurin:21-jre
+COPY --from=build /app/build/libs/*-all.jar /app/server.jar
+EXPOSE 8080
+CMD ["java", "-jar", "/app/server.jar"]</code></pre>
+          <p>
+            Most hosting platforms, such as Render, Railway, Fly.io or Google Cloud Run, can deploy straight from a Dockerfile in your
+            Git repository. Because the server reads the <code>PORT</code> variable, it will listen wherever the platform tells it to.
+            Check each platform's current pricing; several offer a free or low-cost tier for small projects.
+          </p>
+        </section>
+
+        <section id="next" data-toc="What's next">
+          <h2><span class="h-num">09</span> What's next</h2>
+          <p>You now have a real, tested, deployable API. To make it production-ready, the usual next steps are:</p>
+          <ol class="steps">
+            <li><strong>A real database</strong>, like PostgreSQL with Exposed, or MongoDB, instead of the in-memory map.</li>
+            <li><strong>Authentication</strong> with JWT, so each user only sees their own tasks.</li>
+            <li><strong>Sync endpoints</strong> with versions and change logs, so mobile apps can work offline and catch up later.</li>
+          </ol>
+
+          <div class="course-cta">
+            <div class="course-cta__glow" aria-hidden="true"></div>
+            <div class="course-cta__body">
+              <p class="kicker">Build a real backend</p>
+              <h3>Offline-First Android App</h3>
+              <p>Build a Ktor backend with task versioning, change logs, tombstones and cursor-based sync, and connect it to an offline-first Android app.</p>
+              <div class="course-cta__actions">
+                <a href="https://ezylern.com/course/offline-first-android-development" class="btn btn--primary">View the course →</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="article-book">
+        <a class="book-plug" href="../books/index.html#book-kotlin">
+          <div class="book"><div class="cover cover--img"><img src="../books/covers/kotlin.webp" alt="Kotlin Interview Questions &amp; Answers book cover" width="600" height="833" loading="lazy" decoding="async" /></div></div>
+          <span class="book-plug__text">
+            <span class="book-plug__label">Go deeper for interviews</span>
+            <span class="book-plug__title">Kotlin Interview Questions &amp; Answers</span>
+            <span class="book-plug__desc">140+ real questions with code examples, from junior to senior.</span>
+          </span>
+        </a>
+        </div>
+
+        <!-- Author -->
+        <aside class="author">
+          <img src="../me.webp" alt="Himanshu Gaur" width="72" height="72" loading="lazy" />
+          <div>
+            <p class="author__name">Written by Himanshu Gaur</p>
+            <p>Android developer building production apps with Kotlin, Kotlin Multiplatform and Ktor. I teach the stuff I wish someone had explained to me, with real code.</p>
+            <a href="index.html" class="link-arrow">More articles →</a>
+          </div>
+        </aside>
+      </article>
+    </div>
+
+    <!-- ============ NEWSLETTER ============ -->
+    <section class="section cta" id="newsletter">
+      <div class="container">
+        <div class="cta__box reveal">
+          <div class="cta__glow" aria-hidden="true"></div>
+          <h2>Get one practical Kotlin tip every week.</h2>
+          <p class="sub">Short, useful, no spam. Plus early access to new courses.</p>
+          <!-- REPLACE: point this form at your email provider -->
+          <form class="signup" id="signup" action="#" method="post">
+            <label class="sr-only" for="email">Email address</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" required autocomplete="email" />
+            <button class="btn btn--primary" type="submit">Join free</button>
+          </form>
+          <p class="signup__msg" id="signup-msg" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <a href="../index.html" class="logo">
+        <span class="logo__mark" aria-hidden="true">&lt;/&gt;</span>
+        <span class="logo__text">android<span class="dim">with</span>himanshu</span>
+      </a>
+      <nav>
+        <a href="../index.html#courses">Courses</a>
+        <a href="../books/index.html">Books</a>
+        <a href="index.html">Blog</a>
+        <a href="../index.html#about">About</a>
+        <a href="https://ezylern.com">Student login</a>
+      </nav>
+      <p class="dim">© <span id="year"></span> Himanshu Gaur. Built with Kotlin on the brain.</p>
+    </div>
+  </footer>
+
+  <script src="article.js"></script>
+</body>
+</html>

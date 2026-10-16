@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Android with Himanshu — Android, Kotlin Multiplatform &amp; Ktor Courses</title>
+  <meta name="description" content="Project-based courses on Android architecture, offline-first apps, Compose Multiplatform and full-stack Kotlin with Ktor." />
+  <meta property="og:title" content="Write Kotlin once. Ship everywhere." />
+  <meta property="og:description" content="Hands-on Android, Kotlin Multiplatform and Ktor courses from a working Android engineer." />
+  <link rel="canonical" href="https://androidwithhimanshu.com/" />
+  <meta property="og:url" content="https://androidwithhimanshu.com/" />
+  <meta property="og:site_name" content="Android with Himanshu" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#0b0a12" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script>document.documentElement.classList.add("js")</script>
+</head>
+<body>
+  <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav" id="nav">
+    <div class="container nav__inner">
+      <a href="#top" class="logo" aria-label="Android with Himanshu, home">
+        <span class="logo__mark" aria-hidden="true">&lt;/&gt;</span>
+        <span class="logo__text">android<span class="dim">with</span>himanshu</span>
+      </a>
+      <nav class="nav__links" id="nav-links">
+        <a href="#paths">Find your path</a>
+        <a href="#courses">Courses</a>
+        <a href="books/index.html">Books</a>
+        <a href="#blog">Blog</a>
+        <a href="#about">About</a>
+      </nav>
+      <div class="nav__cta">
+        <a href="https://ezylern.com" class="btn btn--ghost btn--sm">Student login</a>
+        <a href="#courses" class="btn btn--primary btn--sm">Start learning</a>
+      </div>
+      <button class="nav__toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+      <div class="hero__glow" aria-hidden="true"></div>
+      <div class="hero__grid" aria-hidden="true"></div>
+      <div class="container hero__inner">
+        <div class="hero__copy reveal">
+          <p class="eyebrow"><span class="pulse"></span> Android · Kotlin Multiplatform · Ktor</p>
+          <h1>
+            Write Kotlin <span class="grad">once.</span><br />
+            Ship Android, iOS<br class="br-lg" /> <em>and</em> your backend.
+          </h1>
+          <p class="lead">
+            Practical, project-first courses from a working Android engineer.
+            Stop rewriting the same app three times. Learn the Kotlin stack teams are hiring for right now.
+          </p>
+          <div class="hero__ctas">
+            <a href="#paths" class="btn btn--primary btn--lg">Find my learning path <span aria-hidden="true">→</span></a>
+            <!-- REPLACE: your YouTube channel URL -->
+            <a href="https://youtube.com/@REPLACE-WITH-YOUR-CHANNEL" class="btn btn--ghost btn--lg" target="_blank" rel="noopener">
+              <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z"/></svg>
+              Watch free lessons
+            </a>
+          </div>
+          <ul class="hero__proof">
+            <li><strong>1</strong> language</li>
+            <li><strong>3</strong> platforms</li>
+            <li><strong>0</strong> rewrites</li>
+          </ul>
+        </div>
+
+        <!-- Interactive code window -->
+        <div class="code reveal" style="--d: .15s">
+          <div class="code__bar">
+            <span class="dots"><i></i><i></i><i></i></span>
+            <div class="code__tabs" role="tablist" aria-label="Code samples">
+              <button role="tab" class="is-active" data-snippet="shared">shared</button>
+              <button role="tab" data-snippet="android">android</button>
+              <button role="tab" data-snippet="ios">ios</button>
+              <button role="tab" data-snippet="server">server</button>
+            </div>
+          </div>
+          <div class="code__file" id="code-file">commonMain/CourseRepository.kt</div>
+          <pre class="code__body"><code id="code-body"></code><span class="caret" aria-hidden="true"></span></pre>
+          <div class="code__footer">
+            <span id="code-note">One repository. Every platform uses it.</span>
+            <span class="badge">Kotlin 2.x</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="marquee" aria-label="Technologies covered">
+        <div class="marquee__track">
+          <span>Kotlin</span><span>Jetpack Compose</span><span>Compose Multiplatform</span><span>Clean Architecture</span><span>Hilt</span><span>Room</span><span>Retrofit</span><span>Coroutines &amp; Flow</span><span>WorkManager</span><span>Ktor Server</span><span>Ktor Client</span><span>SQLDelight</span><span>Koin</span><span>MongoDB</span><span>JWT Auth</span><span>Offline-first sync</span>
+          <span>Kotlin</span><span>Jetpack Compose</span><span>Compose Multiplatform</span><span>Clean Architecture</span><span>Hilt</span><span>Room</span><span>Retrofit</span><span>Coroutines &amp; Flow</span><span>WorkManager</span><span>Ktor Server</span><span>Ktor Client</span><span>SQLDelight</span><span>Koin</span><span>MongoDB</span><span>JWT Auth</span><span>Offline-first sync</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PROBLEM ============ -->
+    <section class="section problem">
+      <div class="container">
+        <div class="problem__grid">
+          <div class="reveal">
+            <p class="kicker">The problem</p>
+            <h2>Most tutorials teach you to build a toy. <span class="dim">Jobs ask you to ship a product.</span></h2>
+          </div>
+          <ul class="pain reveal" style="--d: .1s">
+            <li><span class="x">✕</span> You know Android, but iOS and backend feel like other worlds</li>
+            <li><span class="x">✕</span> Tutorials stop at "Hello World", right before things get real</li>
+            <li><span class="x">✕</span> Your apps break offline, and you don't know why</li>
+            <li class="pain__fix"><span class="check">✓</span> Here you build <strong>real, production-shaped apps</strong> end to end: UI, shared logic, database, API and server.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PATH FINDER ============ -->
+    <section class="section" id="paths">
+      <div class="container">
+        <div class="section__head reveal">
+          <p class="kicker">30-second quiz</p>
+          <h2>What's holding you back right now?</h2>
+          <p class="sub">Pick the one that sounds most like you. I'll point you to where to start.</p>
+        </div>
+        <div class="paths reveal" style="--d: .1s" role="radiogroup" aria-label="What's holding you back">
+          <button class="path" data-course="architecture" role="radio" aria-checked="false">
+            <span class="path__emoji" aria-hidden="true">🧱</span>
+            <span class="path__title">My code gets messy as the app grows</span>
+            <span class="path__desc">I want to structure apps the way senior engineers do.</span>
+          </button>
+          <button class="path" data-course="offline" role="radio" aria-checked="false">
+            <span class="path__emoji" aria-hidden="true">📡</span>
+            <span class="path__title">My app breaks without internet</span>
+            <span class="path__desc">I want it to work offline and sync on its own.</span>
+          </button>
+          <button class="path" data-course="cmp" role="radio" aria-checked="false">
+            <span class="path__emoji" aria-hidden="true">📱</span>
+            <span class="path__title">I only ship on Android</span>
+            <span class="path__desc">I want iOS and Desktop too, from the same Kotlin code.</span>
+          </button>
+          <button class="path" data-course="fullstack" role="radio" aria-checked="false">
+            <span class="path__emoji" aria-hidden="true">🛠️</span>
+            <span class="path__title">I want to build the whole product</span>
+            <span class="path__desc">Apps and backend, all in Kotlin, with nothing duplicated.</span>
+          </button>
+        </div>
+        <div class="path__result" id="path-result" aria-live="polite" hidden></div>
+      </div>
+    </section>
+
+    <!-- ============ COURSES ============ -->
+    <section class="section courses" id="courses">
+      <div class="container">
+        <div class="section__head reveal">
+          <p class="kicker">Courses</p>
+          <h2>Learn by shipping. Not by watching.</h2>
+          <p class="sub">Every course is built around one real project that you build yourself, start to finish.</p>
+        </div>
+
+        <div class="cards cards--4">
+          <!-- COURSE 1 -->
+          <article class="card card--green reveal" id="course-architecture" data-tilt>
+            <div class="card__top">
+              <span class="tag tag--green">Android</span>
+              <span class="card__num" aria-hidden="true">01</span>
+            </div>
+            <h3>Android Architecture Mastery</h3>
+            <p class="card__sub">Production-ready apps with Clean Architecture, modularization, Compose, Hilt, Room, Retrofit &amp; testing</p>
+            <p>Most tutorials teach you to make an app work. This one teaches you to build apps that survive years of development, multiple developers, changing requirements and millions of users.</p>
+            <p class="card__build"><span>You'll build</span> A complete, production-grade, multi-module Android app</p>
+            <ul class="card__list">
+              <li>Clean Architecture + MVVM in a multi-module project</li>
+              <li>Dependency injection with Hilt</li>
+              <li>Room, Retrofit, Coroutines &amp; Flow</li>
+              <li>Repository pattern, use cases &amp; state management</li>
+              <li>Unit testing &amp; scalability patterns</li>
+            </ul>
+            <p class="card__book">📘 Interview prep: <a href="books/index.html#book-android">Core Android Interview Questions &amp; Answers</a></p>
+            <details class="more">
+              <summary>Who it's for</summary>
+              <p>Developers preparing for senior Android interviews, freelancing, building startup products or working in large teams. Learn to think like an Android <em>architect</em>, not just an Android developer.</p>
+            </details>
+            <a href="https://ezylern.com/course/android-architecture-mastery" class="btn btn--primary btn--block">Enroll now <span aria-hidden="true">→</span></a>
+          </article>
+
+          <!-- COURSE 2 -->
+          <article class="card card--orange reveal" style="--d: .08s" id="course-offline" data-tilt>
+            <span class="ribbon">Own Ktor backend</span>
+            <div class="card__top">
+              <span class="tag tag--orange">Android + Ktor</span>
+              <span class="card__num" aria-hidden="true">02</span>
+            </div>
+            <h3>Offline-First Android App</h3>
+            <p class="card__sub">Room, WorkManager and multi-device sync, with a backend you build yourself</p>
+            <p>What happens when your app loses its connection? Build one that keeps working, then syncs everything by itself when the network comes back. No Firebase, no magic.</p>
+            <p class="card__build"><span>You'll build</span> A task manager that works fully offline and syncs across devices</p>
+            <ul class="card__list">
+              <li>Room as the single source of truth</li>
+              <li>Background sync with WorkManager</li>
+              <li>Your own Ktor backend with versioning &amp; change logs</li>
+              <li>Cursor-based incremental sync &amp; tombstones for deletes</li>
+              <li>Conflicts, stale data &amp; multi-device sync</li>
+            </ul>
+            <p class="card__book">📘 Interview prep: <a href="books/index.html#book-coroutines">Kotlin Coroutines &amp; Flow Interview Questions &amp; Answers</a></p>
+            <details class="more">
+              <summary>See the sync architecture</summary>
+              <ol class="flow" aria-label="Sync flow">
+                <li>User action</li><li>Room</li><li>Pending sync</li><li>WorkManager</li><li>Ktor backend</li>
+                <li>Server version + change log</li><li>Cursor-based download</li><li>Room</li><li>UI</li>
+              </ol>
+              <p>The UI always reads from Room, so the app stays fast and usable with no network at all.</p>
+            </details>
+            <a href="https://ezylern.com/course/offline-first-android-development" class="btn btn--primary btn--block">Enroll now <span aria-hidden="true">→</span></a>
+          </article>
+
+          <!-- COURSE 3 -->
+          <article class="card card--purple reveal" id="course-cmp" data-tilt>
+            <div class="card__top">
+              <span class="tag tag--purple">Android · iOS · Desktop</span>
+              <span class="card__num" aria-hidden="true">03</span>
+            </div>
+            <h3>Compose Multiplatform: Build Gamopedia</h3>
+            <p class="card__sub">One Kotlin codebase, three platforms</p>
+            <p>Build Gamopedia, a modern gaming encyclopedia, from scratch. Share your UI and business logic, and run the same app on Android, iOS and Desktop.</p>
+            <p class="card__build"><span>You'll build</span> Gamopedia: browse, search, favorites and offline caching</p>
+            <ul class="card__list">
+              <li>Kotlin Multiplatform project structure</li>
+              <li>Feature + layer based multi-module architecture</li>
+              <li>Clean Architecture &amp; MVVM in KMP</li>
+              <li>Koin, Ktor Client &amp; SQLDelight</li>
+              <li>Cross-platform navigation &amp; platform-specific code</li>
+            </ul>
+            <p class="card__book">📘 Interview prep: <a href="books/index.html#book-compose">Jetpack Compose Interview Questions &amp; Answers</a></p>
+            <details class="more">
+              <summary>Who it's for</summary>
+              <p>Android developers who know Kotlin (and ideally Jetpack Compose) and want to move beyond Android-only development with a portfolio-worthy cross-platform project.</p>
+            </details>
+            <a href="https://ezylern.com/course/gamopedia-build-a-cross-platform-gaming-app-with-compose-multiplatform" class="btn btn--primary btn--block">Enroll now <span aria-hidden="true">→</span></a>
+          </article>
+
+          <!-- COURSE 4 — in progress. When it launches, point the button at the course URL -->
+          <article class="card card--blue card--soon reveal" style="--d: .08s" id="course-fullstack" data-tilt>
+            <span class="ribbon ribbon--soon">In progress</span>
+            <div class="card__top">
+              <span class="tag tag--blue">KMP Full-Stack</span>
+              <span class="card__num" aria-hidden="true">04</span>
+            </div>
+            <h3>Kotlin Multiplatform Full-Stack: Build Splitr</h3>
+            <p class="card__sub">App + backend, in pure Kotlin</p>
+            <p>Build Splitr, a Splitwise-style bill-splitting app, from an empty folder to a working product. One Kotlin codebase powers the server and the apps, so they can never drift out of sync.</p>
+            <p class="card__build"><span>You'll build</span> Splitr: auth, groups, expense splitting and settle-up balances</p>
+            <ul class="card__list">
+              <li>Ktor + MongoDB backend with JWT auth</li>
+              <li>Models &amp; logic shared between apps and server</li>
+              <li>Splitting engine in integer money, no floating-point bugs</li>
+              <li>Android, iOS &amp; Desktop from one Compose UI</li>
+              <li>One <code>commonTest</code> suite for every platform</li>
+            </ul>
+            <p class="card__book">📘 Interview prep: <a href="books/index.html#book-kotlin">Kotlin Interview Questions &amp; Answers</a></p>
+            <details class="more">
+              <summary>What else you'll learn</summary>
+              <p><code>commonMain</code>, platform source sets and <code>expect</code>/<code>actual</code>; layered backend design with Koin; REST API design; secure token storage per platform; packaging and deploying the server and the apps.</p>
+            </details>
+            <a href="#newsletter" class="btn btn--ghost btn--block">Get notified at launch <span aria-hidden="true">→</span></a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ BOOKS ============ -->
+    <section class="section" id="books">
+      <div class="container books-strip">
+        <div class="reveal">
+          <p class="kicker">Books</p>
+          <h2>Interview coming up? <span class="grad">Get ready.</span></h2>
+          <p class="sub">Four in-depth interview prep books on Kotlin, Jetpack Compose, Coroutines &amp; Flow and Core Android. Real questions, clear answers, from junior to senior.</p>
+          <div class="books-strip__stats">
+            <div><strong>4</strong><span>books</span></div>
+            <div><strong>960+</strong><span>questions</span></div>
+            <div><strong>Amazon</strong><span>available on</span></div>
+          </div>
+          <a href="books/index.html" class="btn btn--primary btn--lg">Explore the books <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="books-strip__shelf reveal" style="--d: .1s">
+            <a href="books/index.html#book-kotlin" aria-label="Kotlin Interview Questions &amp; Answers"><div class="book"><div class="cover cover--img"><img src="books/covers/kotlin.webp" alt="Kotlin Interview Questions &amp; Answers book cover" width="600" height="833" loading="lazy" decoding="async" /></div></div></a>
+            <a href="books/index.html#book-compose" aria-label="Jetpack Compose Interview Questions &amp; Answers"><div class="book"><div class="cover cover--img"><img src="books/covers/compose.webp" alt="Jetpack Compose Interview Questions &amp; Answers book cover" width="600" height="833" loading="lazy" decoding="async" /></div></div></a>
+            <a href="books/index.html#book-coroutines" aria-label="Kotlin Coroutines &amp; Flow Interview Questions &amp; Answers"><div class="book"><div class="cover cover--img"><img src="books/covers/coroutines.webp" alt="Kotlin Coroutines &amp; Flow Interview Questions &amp; Answers book cover" width="600" height="833" loading="lazy" decoding="async" /></div></div></a>
+            <a href="books/index.html#book-android" aria-label="Core Android Interview Questions &amp; Answers"><div class="book"><div class="cover cover--img"><img src="books/covers/android.webp" alt="Core Android Interview Questions &amp; Answers book cover" width="600" height="833" loading="lazy" decoding="async" /></div></div></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ WHAT YOU'LL BUILD ============ -->
+    <section class="section" id="build">
+      <div class="container build">
+        <div class="build__copy reveal">
+          <p class="kicker">What you'll build</p>
+          <h2>One app. Every layer. <span class="grad">Fully yours.</span></h2>
+          <p class="sub">
+            Across the courses you go through every layer of a real product: native UIs on Android, iOS and Desktop,
+            shared Kotlin logic in the middle, and your own Ktor server and database behind it.
+          </p>
+          <p class="sub">Hover or tap a layer to see what you'll learn there.</p>
+          <div class="build__detail" id="layer-detail" aria-live="polite">
+            <strong>Shared KMP module</strong>
+            <span>Models, repositories, use cases, Ktor Client, SQLDelight and Koin. Write it once, test it once in commonTest.</span>
+          </div>
+        </div>
+
+        <div class="stack reveal" style="--d: .1s">
+          <div class="stack__row">
+            <button class="layer layer--android" data-layer="android">
+              <small>UI</small>Android · Compose
+            </button>
+            <button class="layer layer--ios" data-layer="ios">
+              <small>UI</small>iOS &amp; Desktop · CMP
+            </button>
+          </div>
+          <div class="stack__arrow" aria-hidden="true"></div>
+          <button class="layer layer--shared is-active" data-layer="shared">
+            <small>commonMain</small>Shared KMP module
+          </button>
+          <div class="stack__arrow" aria-hidden="true"></div>
+          <button class="layer layer--server" data-layer="server">
+            <small>Backend</small>Ktor server
+          </button>
+          <div class="stack__arrow" aria-hidden="true"></div>
+          <button class="layer layer--db" data-layer="db">
+            <small>Data</small>Room · SQLDelight · MongoDB
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ BLOG ============ -->
+    <section class="section blog" id="blog">
+      <div class="container">
+        <div class="section__head section__head--row reveal">
+          <div>
+            <p class="kicker">From the blog</p>
+            <h2>Deep dives you won't find in the docs</h2>
+          </div>
+          <a href="blog/index.html" class="link-arrow">All articles →</a>
+        </div>
+
+        <div class="posts">
+          <!-- Newest articles. The full list lives in blog/index.html -->
+          <a class="post reveal" href="blog/compose-vs-kotlin-multiplatform.html">
+            <div class="post__art post__art--a" aria-hidden="true"><code>Compose ≠ KMP</code></div>
+            <div class="post__meta"><span class="tag tag--purple">KMP</span> 5 min read</div>
+            <h3>Jetpack Compose vs Kotlin Multiplatform: what's the difference?</h3>
+            <p>One draws your UI, the other shares your code. Here's how they fit together, and which to learn first.</p>
+          </a>
+          <a class="post reveal" style="--d: .08s" href="blog/offline-first-room-flow.html">
+            <div class="post__art post__art--b" aria-hidden="true"><code>Flow&lt;List&lt;T&gt;&gt;</code></div>
+            <div class="post__meta"><span class="tag tag--green">Android</span> 5 min read</div>
+            <h3>Offline-first, done right: a single source of truth with Flow</h3>
+            <p>The pattern that makes your app feel instant, even on a bad connection.</p>
+          </a>
+          <a class="post reveal" style="--d: .16s" href="blog/first-ktor-api.html">
+            <div class="post__art post__art--c" aria-hidden="true"><code>routing { }</code></div>
+            <div class="post__meta"><span class="tag tag--orange">Ktor</span> 5 min read</div>
+            <h3>Your first Ktor API: from an empty project to a live endpoint</h3>
+            <p>From an empty project to a live endpoint your app can call.</p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ABOUT ============ -->
+    <section class="section" id="about">
+      <div class="container about">
+        <div class="about__photo reveal">
+          <div class="avatar">
+            <img src="me.webp" alt="Himanshu Gaur" width="800" height="800" loading="lazy" decoding="async" />
+          </div>
+          <div class="about__chip about__chip--1" aria-hidden="true">@Composable</div>
+          <div class="about__chip about__chip--2" aria-hidden="true">suspend fun</div>
+          <div class="about__chip about__chip--3" aria-hidden="true">expect / actual</div>
+        </div>
+        <div class="reveal" style="--d: .1s">
+          <p class="kicker">Your instructor</p>
+          <h2>Hi, I'm Himanshu 👋</h2>
+          <p class="sub">
+            I'm an Android developer who builds production apps with Kotlin, Kotlin Multiplatform and Ktor.
+            On YouTube I break down the things I wish someone had explained to me: clearly, honestly, and with real code.
+          </p>
+          <p class="sub">
+            My courses are the structured, in-depth version: everything in order, with full projects and source code,
+            so you can stop piecing things together from twenty different videos.
+          </p>
+          <p class="sub">
+            I've also written <a href="books/index.html" class="inline-link">four interview prep books</a> with 960+ questions on Kotlin,
+            Jetpack Compose, Coroutines &amp; Flow and Core Android.
+          </p>
+          <div class="socials">
+            <!-- REPLACE: your profile URLs -->
+            <a href="https://youtube.com/@REPLACE-WITH-YOUR-CHANNEL" target="_blank" rel="noopener">YouTube</a>
+            <a href="https://github.com/REPLACE" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://linkedin.com/in/REPLACE" target="_blank" rel="noopener">LinkedIn</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FAQ ============ -->
+    <section class="section faq">
+      <div class="container container--narrow">
+        <div class="section__head reveal">
+          <p class="kicker">FAQ</p>
+          <h2>Questions, answered</h2>
+        </div>
+        <div class="faq__list reveal">
+          <details>
+            <summary>Which course should I start with?</summary>
+            <p>If you build Android apps today, start with <strong>Android Architecture Mastery</strong>. Then go to <strong>Offline-First Android App</strong> to add sync and your own Ktor backend. When you're ready for iOS and Desktop, take <strong>Compose Multiplatform: Build Gamopedia</strong>. Not sure? Take the 30-second quiz above.</p>
+          </details>
+          <details>
+            <summary>What do I need to know before starting?</summary>
+            <p>The basics of Kotlin and Android development. The multiplatform courses are easier if you already know Jetpack Compose.</p>
+          </details>
+          <details>
+            <summary>Do I need to know Swift or have a Mac?</summary>
+            <p>No Swift needed: the multiplatform UI is written in Compose. You only need a Mac to run the iOS app. Android, Desktop and the Ktor backend work on Windows, macOS and Linux.</p>
+          </details>
+          <details>
+            <summary>Is the Kotlin Multiplatform Full-Stack course available yet?</summary>
+            <p>It's in progress. Join the email list below and you'll hear the moment it launches.</p>
+          </details>
+          <details>
+            <summary>I have an interview soon. Where should I start?</summary>
+            <p>Grab the <a href="books/index.html" class="inline-link">interview prep books</a>: 960+ real questions with in-depth answers on Kotlin, Jetpack Compose, Coroutines &amp; Flow and Core Android. Then use the courses to build the projects you'll talk about.</p>
+          </details>
+          <details>
+            <summary>Where are the courses hosted?</summary>
+            <p>On my course platform. Click "Enroll now", check out securely, and start watching on any device.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ NEWSLETTER / FINAL CTA ============ -->
+    <section class="section cta" id="newsletter">
+      <div class="container">
+        <div class="cta__box reveal">
+          <div class="cta__glow" aria-hidden="true"></div>
+          <h2>Get one practical Kotlin tip every week.</h2>
+          <p class="sub">Short, useful, no spam. Plus early access to new courses.</p>
+          <!-- REPLACE: point this form at your email provider (EzyCourse, ConvertKit, Mailchimp…) -->
+          <form class="signup" id="signup" action="#" method="post">
+            <label class="sr-only" for="email">Email address</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" required autocomplete="email" />
+            <button class="btn btn--primary" type="submit">Join free</button>
+          </form>
+          <p class="signup__msg" id="signup-msg" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <a href="#top" class="logo">
+        <span class="logo__mark" aria-hidden="true">&lt;/&gt;</span>
+        <span class="logo__text">android<span class="dim">with</span>himanshu</span>
+      </a>
+      <nav>
+        <a href="#courses">Courses</a>
+        <a href="books/index.html">Books</a>
+        <a href="blog/index.html">Blog</a>
+        <a href="#about">About</a>
+        <a href="https://ezylern.com">Student login</a>
+      </nav>
+      <p class="dim">© <span id="year"></span> Himanshu Gaur. Built with Kotlin on the brain.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

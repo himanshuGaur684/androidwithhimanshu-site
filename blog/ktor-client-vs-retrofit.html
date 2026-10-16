@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ktor Client vs Retrofit: What Changes When You Go Multiplatform — Android with Himanshu</title>
+  <meta name="description" content="Why Retrofit can't run in Kotlin Multiplatform, how Ktor Client maps to every Retrofit concept, and how to migrate step by step without a big rewrite." />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Ktor Client vs Retrofit: What Changes When You Go Multiplatform" />
+  <meta property="og:description" content="Why Retrofit can't run in Kotlin Multiplatform, how Ktor Client maps to every Retrofit concept, and how to migrate step by step without a big rewrite." />
+  <link rel="canonical" href="https://androidwithhimanshu.com/blog/ktor-client-vs-retrofit" />
+  <meta property="og:url" content="https://androidwithhimanshu.com/blog/ktor-client-vs-retrofit" />
+  <meta property="og:site_name" content="Android with Himanshu" />
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#0b0a12" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="article.css" />
+  <script>document.documentElement.classList.add("js")</script>
+</head>
+<body>
+  <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav" id="nav">
+    <div class="container nav__inner">
+      <a href="../index.html" class="logo" aria-label="Android with Himanshu, home">
+        <span class="logo__mark" aria-hidden="true">&lt;/&gt;</span>
+        <span class="logo__text">android<span class="dim">with</span>himanshu</span>
+      </a>
+      <nav class="nav__links" id="nav-links">
+        <a href="../index.html#paths">Find your path</a>
+        <a href="../index.html#courses">Courses</a>
+        <a href="../books/index.html">Books</a>
+        <a href="index.html">Blog</a>
+        <a href="../index.html#about">About</a>
+      </nav>
+      <div class="nav__cta">
+        <a href="https://ezylern.com" class="btn btn--ghost btn--sm">Student login</a>
+        <a href="../index.html#courses" class="btn btn--primary btn--sm">Start learning</a>
+      </div>
+      <button class="nav__toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ ARTICLE HEADER ============ -->
+    <header class="post-hero">
+      <div class="hero__glow" aria-hidden="true"></div>
+      <div class="container container--article">
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../index.html">Home</a><span>/</span><a href="index.html">Blog</a><span>/</span><span aria-current="page">Ktor Client vs Retrofit</span>
+        </nav>
+        <div class="post-hero__tags">
+          <span class="tag tag--purple">KMP</span>
+          <span class="tag tag--orange">Ktor</span>
+        </div>
+        <h1>Ktor Client vs Retrofit: <span class="grad">what changes</span> when you go multiplatform</h1>
+        <p class="post-hero__lead">Retrofit has served Android well for a decade, but it can't follow your code to iOS. Here's how Ktor Client compares, and how to migrate without breaking your app.</p>
+        <div class="byline">
+          <img src="../me.webp" alt="" width="44" height="44" />
+          <div>
+            <strong>Himanshu Gaur</strong>
+            <span><time datetime="2026-10-16">16 Oct 2026</time> · <span id="read-time">5 min read</span></span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="container article-layout">
+      <!-- ============ TABLE OF CONTENTS ============ -->
+      <aside class="toc" aria-label="On this page">
+        <p class="toc__title">On this page</p>
+        <ol>
+          <li><a href="#tldr">The 30-second answer</a></li>
+          <li><a href="#why">Why Retrofit can't follow you</a></li>
+          <li><a href="#compare">Same API, side by side</a></li>
+          <li><a href="#map">Translation cheat sheet</a></li>
+          <li><a href="#setup">Engines and dependencies</a></li>
+          <li><a href="#auth">Interceptors and auth</a></li>
+          <li><a href="#migrate">Migrate step by step</a></li>
+          <li><a href="#testing">Testing gets easier</a></li>
+          <li><a href="#verdict">Should you switch?</a></li>
+        </ol>
+      </aside>
+
+      <!-- ============ ARTICLE BODY ============ -->
+      <article class="prose" id="article">
+        <section id="tldr" data-toc="The 30-second answer">
+          <div class="tldr">
+            <p class="tldr__label">TL;DR</p>
+            <ul>
+              <li><strong>Retrofit is JVM-only.</strong> It's built on OkHttp and Java reflection, so it can't run in <code>commonMain</code> or on iOS.</li>
+              <li><strong>Ktor Client is multiplatform.</strong> You write requests once, and each platform plugs in its own engine: OkHttp on Android, Darwin on iOS.</li>
+              <li>Almost every Retrofit concept has a direct Ktor equivalent. It's a <strong>translation</strong>, not a rewrite of how you think.</li>
+              <li>You can migrate <strong>gradually</strong> behind an interface, and you don't have to switch at all if your app is Android-only.</li>
+            </ul>
+          </div>
+          <p>
+            Retrofit has been the default on Android for a decade, and for good reason. But the moment you move your networking into
+            a Kotlin Multiplatform module, it stops compiling. Here's why, and what changes when you switch to Ktor Client.
+          </p>
+        </section>
+
+        <section id="why" data-toc="Why Retrofit can't follow you">
+          <h2><span class="h-num">01</span> Why Retrofit can't follow you to iOS</h2>
+          <p>
+            Retrofit works by reading your annotated interface at runtime and generating an implementation using Java's dynamic proxies.
+            Underneath, requests go through <strong>OkHttp</strong>. Both of those live on the JVM.
+          </p>
+          <p>
+            Your shared KMP code, though, also compiles to <strong>native iOS binaries</strong>, where there is no JVM, no Java reflection and no OkHttp.
+            So anything in <code>commonMain</code> can only depend on libraries that are themselves multiplatform.
+          </p>
+          <div class="pipeline" aria-label="Ktor Client engines">
+            <div class="pipeline__node pipeline__node--hot">Your API code <small>commonMain · written once</small></div>
+            <div class="pipeline__arrow"><span>runs on</span></div>
+            <div class="pipeline__node">Ktor Client <small>multiplatform core + plugins</small></div>
+            <div class="pipeline__arrow"><span>plugs into an engine per platform</span></div>
+            <div class="pipeline__node">OkHttp (Android) · Darwin (iOS) · CIO / Java (Desktop) · Js (Web)</div>
+          </div>
+        </section>
+
+        <section id="compare" data-toc="Same API, side by side">
+          <h2><span class="h-num">02</span> The same API, side by side</h2>
+          <p>Here's a typical games API in both libraries. Switch tabs to compare.</p>
+          <div class="code-tabs">
+            <div class="code-tabs__bar" role="tablist" aria-label="Library">
+              <button type="button" role="tab" data-tab="retrofit" aria-selected="true">Retrofit</button>
+              <button type="button" role="tab" data-tab="ktor" aria-selected="false">Ktor Client</button>
+            </div>
+<pre class="codeblock" data-lang="kotlin" data-file="androidMain only · GameApi.kt" data-panel="retrofit"><code>interface GameApi {
+    @GET("games")
+    suspend fun games(@Query("page") page: Int): GamesResponse
+
+    @GET("games/{id}")
+    suspend fun game(@Path("id") id: Int): GameDto
+}
+
+val api: GameApi = Retrofit.Builder()
+    .baseUrl("https://api.example.com/")
+    .client(okHttpClient)
+    .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+    .build()
+    .create(GameApi::class.java)</code></pre>
+<pre class="codeblock" data-lang="kotlin" data-file="commonMain · GameApi.kt" data-panel="ktor" hidden><code>class GameApi(private val client: HttpClient) {
+
+    suspend fun games(page: Int): GamesResponse =
+        client.get("games") { parameter("page", page) }.body()
+
+    suspend fun game(id: Int): GameDto =
+        client.get("games/$id").body()
+}
+
+val client = HttpClient {
+    install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
+    defaultRequest { url("https://api.example.com/") }
+    expectSuccess = true   // throw on 4xx / 5xx, like Retrofit's HttpException
+}</code></pre>
+          </div>
+          <p>
+            The biggest mindset shift: Retrofit is <strong>declarative</strong> (annotations describe a request), while Ktor is
+            <strong>imperative</strong> (you build the request in code). It's slightly more typing, but there's no magic,
+            and everything is plain Kotlin you can step through in a debugger.
+          </p>
+        </section>
+
+        <section id="map" data-toc="Translation cheat sheet">
+          <h2><span class="h-num">03</span> The translation cheat sheet</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Retrofit / OkHttp</th><th>Ktor Client</th></tr>
+              </thead>
+              <tbody>
+                <tr><th><code>@GET("path")</code></th><td><code>client.get("path")</code></td></tr>
+                <tr><th><code>@Query("page")</code></th><td><code>parameter("page", page)</code></td></tr>
+                <tr><th><code>@Path("id")</code></th><td>String template: <code>"games/$id"</code></td></tr>
+                <tr><th><code>@Body</code></th><td><code>setBody(dto)</code> + <code>contentType(ContentType.Application.Json)</code></td></tr>
+                <tr><th><code>@Header</code></th><td><code>header("X-Key", value)</code>, or <code>defaultRequest</code> for every call</td></tr>
+                <tr><th>Converter factory</th><td><code>ContentNegotiation</code> plugin</td></tr>
+                <tr><th>OkHttp interceptor</th><td>A plugin: <code>Logging</code>, <code>DefaultRequest</code>, or your own with <code>createClientPlugin</code></td></tr>
+                <tr><th>OkHttp <code>Authenticator</code></th><td><code>Auth</code> plugin with <code>bearer { refreshTokens { } }</code></td></tr>
+                <tr><th>Timeouts</th><td><code>HttpTimeout</code> plugin</td></tr>
+                <tr><th><code>Response&lt;T&gt;</code></th><td><code>HttpResponse</code> (status, headers, then <code>.body&lt;T&gt;()</code>)</td></tr>
+                <tr><th><code>HttpException</code></th><td><code>ClientRequestException</code> (4xx) / <code>ServerResponseException</code> (5xx) when <code>expectSuccess = true</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="setup" data-toc="Engines and dependencies">
+          <h2><span class="h-num">04</span> Engines and dependencies</h2>
+          <p>
+            Put the core and plugins in <code>commonMain</code>, and one engine per platform in its own source set.
+            When there's exactly one engine on the classpath, <code>HttpClient { }</code> picks it up automatically.
+          </p>
+<pre class="codeblock" data-lang="kotlin" data-file="shared / build.gradle.kts"><code>kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation("io.ktor:ktor-client-core:$ktor")
+            implementation("io.ktor:ktor-client-content-negotiation:$ktor")
+            implementation("io.ktor:ktor-client-logging:$ktor")
+            implementation("io.ktor:ktor-client-auth:$ktor")
+            implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor")
+        }
+        androidMain.dependencies {
+            implementation("io.ktor:ktor-client-okhttp:$ktor")   // keep using OkHttp on Android
+        }
+        iosMain.dependencies {
+            implementation("io.ktor:ktor-client-darwin:$ktor")   // NSURLSession under the hood
+        }
+        commonTest.dependencies {
+            implementation("io.ktor:ktor-client-mock:$ktor")
+        }
+    }
+}</code></pre>
+          <div class="callout">
+            <span class="callout__icon" aria-hidden="true">💡</span>
+            <p>On Android, Ktor can run on <strong>OkHttp</strong>, so you keep its connection pooling and HTTP/2 support. You're changing the API you write, not the HTTP stack underneath.</p>
+          </div>
+        </section>
+
+        <section id="auth" data-toc="Interceptors and auth">
+          <h2><span class="h-num">05</span> Interceptors and token refresh</h2>
+          <p>
+            In Retrofit land, you'd write an OkHttp interceptor to add the token and an <code>Authenticator</code> to refresh it.
+            Ktor's <code>Auth</code> plugin handles both, and it works on every platform.
+          </p>
+<pre class="codeblock" data-lang="kotlin" data-file="commonMain · HttpClientFactory.kt"><code>fun createHttpClient(tokens: TokenStore) = HttpClient {
+    install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
+    install(Logging) { level = LogLevel.INFO }
+    install(HttpTimeout) { requestTimeoutMillis = 15_000 }
+    defaultRequest { url("https://api.example.com/") }
+    expectSuccess = true
+
+    install(Auth) {
+        bearer {
+            loadTokens {
+                tokens.load()?.let { BearerTokens(it.access, it.refresh) }
+            }
+            refreshTokens {
+                val fresh: TokenResponse = client.post("auth/refresh") {
+                    markAsRefreshTokenRequest()
+                    contentType(ContentType.Application.Json)
+                    setBody(RefreshRequest(oldTokens?.refreshToken.orEmpty()))
+                }.body()
+                tokens.save(fresh)
+                BearerTokens(fresh.access, fresh.refresh)
+            }
+        }
+    }
+}</code></pre>
+          <p>When a request comes back <strong>401</strong>, Ktor calls <code>refreshTokens</code> once and retries the original request with the new token.</p>
+        </section>
+
+        <section id="migrate" data-toc="Migrate step by step">
+          <h2><span class="h-num">06</span> Migrate without a big-bang rewrite</h2>
+          <p>You don't need to switch everything in one PR. Put an interface in front of your networking and swap the implementation behind it.</p>
+          <ol class="steps">
+            <li><strong>Move your DTOs to <code>commonMain</code></strong> and make them <code>@Serializable</code>. Retrofit can keep using them through its kotlinx.serialization converter.</li>
+            <li><strong>Define a data-source interface</strong> that the rest of your app depends on, instead of the Retrofit interface itself.</li>
+            <li><strong>Add a Ktor implementation</strong> next to the Retrofit one, and switch them in your DI module, one endpoint group at a time.</li>
+            <li><strong>Delete Retrofit</strong> once nothing uses it.</li>
+          </ol>
+<pre class="codeblock" data-lang="kotlin" data-file="commonMain · GameRemoteDataSource.kt"><code>interface GameRemoteDataSource {
+    suspend fun games(page: Int): GamesResponse
+    suspend fun game(id: Int): GameDto
+}
+
+// androidMain: the old one, kept during the migration
+class RetrofitGameDataSource(private val api: RetrofitGameApi) : GameRemoteDataSource {
+    override suspend fun games(page: Int) = api.games(page)
+    override suspend fun game(id: Int) = api.game(id)
+}
+
+// commonMain: the new one, shared with iOS
+class KtorGameDataSource(private val client: HttpClient) : GameRemoteDataSource {
+    override suspend fun games(page: Int): GamesResponse =
+        client.get("games") { parameter("page", page) }.body()
+
+    override suspend fun game(id: Int): GameDto =
+        client.get("games/$id").body()
+}</code></pre>
+        </section>
+
+        <section id="testing" data-toc="Testing gets easier">
+          <h2><span class="h-num">07</span> Bonus: testing gets easier</h2>
+          <p>
+            With Retrofit you'd usually spin up a <code>MockWebServer</code>. Ktor ships a <code>MockEngine</code>: you hand it a lambda
+            that returns fake responses, and your tests run in <code>commonTest</code> on <strong>every platform</strong>.
+          </p>
+<pre class="codeblock" data-lang="kotlin" data-file="commonTest · KtorGameDataSourceTest.kt"><code>class KtorGameDataSourceTest {
+
+    @Test
+    fun parsesGame() = runTest {
+        val engine = MockEngine { request -&gt;
+            assertEquals("/games/42", request.url.encodedPath)
+            respond(
+                content = """{"id":42,"name":"Hollow Knight"}""",
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "application/json"),
+            )
+        }
+        val client = HttpClient(engine) {
+            install(ContentNegotiation) { json() }
+            defaultRequest { url("https://api.example.com/") }
+        }
+
+        val game = KtorGameDataSource(client).game(42)
+
+        assertEquals("Hollow Knight", game.name)
+    }
+}</code></pre>
+        </section>
+
+        <section id="verdict" data-toc="Should you switch?">
+          <h2><span class="h-num">08</span> So, should you switch?</h2>
+          <div class="choose">
+            <div class="choose__card">
+              <span class="choose__emoji" aria-hidden="true">🤖</span>
+              <h3>Keep Retrofit</h3>
+              <p>Your app is <strong>Android-only</strong> with no plans for iOS or Desktop. Retrofit is mature and great. Don't switch just to switch.</p>
+            </div>
+            <div class="choose__card">
+              <span class="choose__emoji" aria-hidden="true">🔀</span>
+              <h3>Migrate gradually</h3>
+              <p>You're <strong>starting to share code</strong> with iOS. Put an interface in front, then move endpoints over one group at a time.</p>
+            </div>
+            <div class="choose__card choose__card--best">
+              <span class="choose__emoji" aria-hidden="true">🚀</span>
+              <h3>Start with Ktor</h3>
+              <p>You're building a <strong>new multiplatform app</strong>. Use Ktor Client from day one, and share networking everywhere.</p>
+            </div>
+          </div>
+
+          <div class="course-cta" style="margin-top: 36px">
+            <div class="course-cta__glow" aria-hidden="true"></div>
+            <div class="course-cta__body">
+              <p class="kicker">See it in a real project</p>
+              <h3>Compose Multiplatform: Build Gamopedia</h3>
+              <p>Use Ktor Client, Koin and SQLDelight in a real multi-module KMP app that runs on Android, iOS and Desktop.</p>
+              <div class="course-cta__actions">
+                <a href="https://ezylern.com/course/gamopedia-build-a-cross-platform-gaming-app-with-compose-multiplatform" class="btn btn--primary">View the course →</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="article-book">
+        <a class="book-plug" href="../books/index.html#book-coroutines">
+          <div class="book"><div class="cover cover--img"><img src="../books/covers/coroutines.webp" alt="Kotlin Coroutines &amp; Flow Interview Questions &amp; Answers book cover" width="600" height="833" loading="lazy" decoding="async" /></div></div>
+          <span class="book-plug__text">
+            <span class="book-plug__label">Go deeper for interviews</span>
+            <span class="book-plug__title">Kotlin Coroutines &amp; Flow Interview Questions &amp; Answers</span>
+            <span class="book-plug__desc">300 in-depth questions on structured concurrency, cancellation, Flow and testing.</span>
+          </span>
+        </a>
+        </div>
+
+        <!-- Author -->
+        <aside class="author">
+          <img src="../me.webp" alt="Himanshu Gaur" width="72" height="72" loading="lazy" />
+          <div>
+            <p class="author__name">Written by Himanshu Gaur</p>
+            <p>Android developer building production apps with Kotlin, Kotlin Multiplatform and Ktor. I teach the stuff I wish someone had explained to me, with real code.</p>
+            <a href="index.html" class="link-arrow">More articles →</a>
+          </div>
+        </aside>
+      </article>
+    </div>
+
+    <!-- ============ NEWSLETTER ============ -->
+    <section class="section cta" id="newsletter">
+      <div class="container">
+        <div class="cta__box reveal">
+          <div class="cta__glow" aria-hidden="true"></div>
+          <h2>Get one practical Kotlin tip every week.</h2>
+          <p class="sub">Short, useful, no spam. Plus early access to new courses.</p>
+          <!-- REPLACE: point this form at your email provider -->
+          <form class="signup" id="signup" action="#" method="post">
+            <label class="sr-only" for="email">Email address</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" required autocomplete="email" />
+            <button class="btn btn--primary" type="submit">Join free</button>
+          </form>
+          <p class="signup__msg" id="signup-msg" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <a href="../index.html" class="logo">
+        <span class="logo__mark" aria-hidden="true">&lt;/&gt;</span>
+        <span class="logo__text">android<span class="dim">with</span>himanshu</span>
+      </a>
+      <nav>
+        <a href="../index.html#courses">Courses</a>
+        <a href="../books/index.html">Books</a>
+        <a href="index.html">Blog</a>
+        <a href="../index.html#about">About</a>
+        <a href="https://ezylern.com">Student login</a>
+      </nav>
+      <p class="dim">© <span id="year"></span> Himanshu Gaur. Built with Kotlin on the brain.</p>
+    </div>
+  </footer>
+
+  <script src="article.js"></script>
+</body>
+</html>
