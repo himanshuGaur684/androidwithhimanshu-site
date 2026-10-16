@@ -5,7 +5,8 @@
   "description": "Android with Himanshu: courses, interview books and blog (static site served by a tiny Node server).",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "stamp": "node stamp-assets.js"
   },
   "engines": {
     "node": ">=18"

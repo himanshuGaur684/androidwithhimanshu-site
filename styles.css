@@ -627,3 +627,9 @@ details p { padding: 0 24px 20px; color: var(--muted); margin: 0; }
 /* Two featured videos per language */
 .vgrid { grid-template-columns: repeat(2, 1fr); }
 @media (max-width: 640px) { .vgrid { grid-template-columns: 1fr; } }
+/* Clearer language tabs */
+.vtabs { padding: 6px; gap: 4px; }
+.vtabs button { display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; font-size: 1rem; color: var(--text); opacity: .7; }
+.vtabs button:hover { opacity: 1; background: rgba(255, 255, 255, .06); }
+.vtabs button[aria-selected="true"] { opacity: 1; box-shadow: 0 8px 24px -10px rgba(127, 82, 255, .8); }
+.vtabs button[lang="hi"] { font-family: "Noto Sans Devanagari", var(--font); }

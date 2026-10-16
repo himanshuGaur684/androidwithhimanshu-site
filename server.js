@@ -22,7 +22,7 @@ const TYPES = {
 };
 
 // Server-side files that should never be downloadable
-const PRIVATE = new Set(["/server.js", "/package.json", "/package-lock.json"]);
+const PRIVATE = new Set(["/server.js", "/stamp-assets.js", "/package.json", "/package-lock.json"]);
 
 const isFile = (p) => {
   try {
