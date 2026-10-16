@@ -557,3 +557,73 @@ details p { padding: 0 24px 20px; color: var(--muted); margin: 0; }
 .logo__mark { font-family: var(--mono); font-size: .74rem; letter-spacing: -.06em; }
 .logo__text { letter-spacing: -.03em; }
 .logo__text .dim { margin: 0 1px; font-weight: 600; }
+
+/* ============ Videos ============ */
+.vtabs { display: flex; gap: 6px; padding: 5px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line-2); align-self: end; }
+.vtabs button { padding: 9px 18px; border-radius: 999px; border: 0; background: transparent; font-weight: 600; font-size: .92rem; color: var(--muted); transition: all .2s; }
+.vtabs button[aria-selected="true"] { background: var(--grad); color: #fff; }
+.vgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.vcard { display: flex; flex-direction: column; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); overflow: hidden; transition: border-color .3s, transform .3s; }
+.vcard:hover { border-color: var(--line-2); transform: translateY(-4px); }
+.vcard__thumb, .video-plug__thumb { position: relative; display: block; aspect-ratio: 16 / 9; overflow: hidden; background: #000; }
+.vcard__thumb img, .video-plug__thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+.vcard:hover .vcard__thumb img { transform: scale(1.05); }
+.vcard__play {
+  position: absolute; left: 50%; top: 50%; width: 64px; height: 44px; transform: translate(-50%, -50%); border-radius: 12px;
+  background: rgba(0, 0, 0, .65); transition: background .2s, transform .2s;
+}
+.vcard__play::after { content: ""; position: absolute; left: 50%; top: 50%; transform: translate(-35%, -50%); border-style: solid; border-width: 9px 0 9px 15px; border-color: transparent transparent transparent #fff; }
+.vcard__thumb:hover .vcard__play, .video-plug:hover .vcard__play { background: #ff0033; transform: translate(-50%, -50%) scale(1.08); }
+.vcard__body { display: flex; flex-direction: column; gap: 8px; padding: 18px 20px 22px; flex: 1; }
+.vcard__tag { font-family: var(--mono); font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; color: var(--orange); }
+.vcard__title { font-size: 1.02rem; line-height: 1.4; margin: 0; letter-spacing: -.01em; }
+.vcard__more { margin-top: auto; padding-top: 6px; font-size: .88rem; font-weight: 600; color: #b39aff; }
+.vcard__more:hover { color: #fff; }
+.vpanel__cta { display: flex; align-items: center; justify-content: center; gap: 14px 26px; flex-wrap: wrap; margin-top: 34px; }
+
+/* "Watch the free intro" inside course cards */
+.card__video {
+  display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; margin: -6px 0 16px; padding: 7px 14px; border-radius: 999px;
+  font-size: .86rem; font-weight: 600; color: var(--text); background: rgba(255, 0, 51, .12); border: 1px solid rgba(255, 0, 51, .35); transition: background .2s;
+}
+.card__video span { color: #ff4d6d; font-size: .75rem; }
+.card__video:hover { background: rgba(255, 0, 51, .22); }
+
+/* "Prefer video?" card in blog articles */
+.video-plug {
+  display: flex; align-items: center; gap: 18px; padding: 12px; margin: -30px 0 56px; border-radius: var(--radius); text-decoration: none !important;
+  background: var(--surface); border: 1px solid var(--line-2); transition: border-color .2s;
+}
+.video-plug:hover { border-color: rgba(255, 0, 51, .5); }
+.video-plug__thumb { flex: none; width: 190px; border-radius: 10px; }
+.video-plug .vcard__play { width: 46px; height: 32px; border-radius: 9px; }
+.video-plug .vcard__play::after { border-width: 7px 0 7px 11px; }
+.video-plug__text { display: grid; gap: 4px; }
+.video-plug__label { font-family: var(--mono); font-size: .72rem; text-transform: uppercase; letter-spacing: .12em; color: #ff4d6d; }
+.video-plug__title { font-weight: 700; color: var(--text); line-height: 1.35; }
+
+/* Video pop-up */
+.vmodal { width: min(1000px, 94vw); padding: 0; border: 0; background: transparent; color: var(--text); overflow: visible; }
+.vmodal::backdrop { background: rgba(5, 4, 10, .85); backdrop-filter: blur(6px); }
+.vmodal__box { position: relative; }
+.vmodal__frame { aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; background: #000; box-shadow: 0 30px 80px rgba(0, 0, 0, .6); }
+.vmodal__frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+.vmodal__close {
+  position: absolute; top: -48px; right: 0; width: 40px; height: 40px; border-radius: 50%; font-size: 1rem;
+  background: rgba(255, 255, 255, .1); border: 1px solid var(--line-2); color: #fff;
+}
+.vmodal__close:hover { background: rgba(255, 255, 255, .2); }
+.vmodal__yt { display: inline-block; margin-top: 12px; font-size: .9rem; color: var(--muted); }
+.vmodal__yt:hover { color: #fff; }
+
+@media (max-width: 1000px) { .vgrid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 640px) {
+  .vgrid { grid-template-columns: 1fr; }
+  .vtabs { align-self: flex-start; }
+  .video-plug { flex-direction: column; align-items: stretch; gap: 12px; margin-top: -20px; }
+  .video-plug__thumb { width: 100%; }
+  .video-plug__text { padding: 0 6px 6px; }
+}
+/* Two featured videos per language */
+.vgrid { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 640px) { .vgrid { grid-template-columns: 1fr; } }
