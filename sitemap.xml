@@ -2,7 +2,8 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://androidwithhimanshu.com/</loc><lastmod>2026-10-16</lastmod></url>
   <url><loc>https://androidwithhimanshu.com/books/</loc><lastmod>2026-10-16</lastmod></url>
-  <url><loc>https://androidwithhimanshu.com/blog/</loc><lastmod>2026-10-16</lastmod></url>
+  <url><loc>https://androidwithhimanshu.com/blog/</loc><lastmod>2026-10-25</lastmod></url>
+  <url><loc>https://androidwithhimanshu.com/blog/kmp-modularization</loc><lastmod>2026-10-25</lastmod></url>
   <url><loc>https://androidwithhimanshu.com/blog/compose-vs-kotlin-multiplatform</loc><lastmod>2026-10-16</lastmod></url>
   <url><loc>https://androidwithhimanshu.com/blog/first-ktor-api</loc><lastmod>2026-10-16</lastmod></url>
   <url><loc>https://androidwithhimanshu.com/blog/ktor-client-vs-retrofit</loc><lastmod>2026-10-16</lastmod></url>

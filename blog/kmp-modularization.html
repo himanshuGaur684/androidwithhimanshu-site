@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kotlin Multiplatform Modularization: How to Structure a KMP Project That Scales — Android with Himanshu</title>
+  <meta name="description" content="Split a Kotlin Multiplatform project into feature and layer modules, set dependency rules, use Gradle convention plugins, wire Koin, and ship one iOS framework." />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Kotlin Multiplatform Modularization: How to Structure a KMP Project That Scales" />
+  <meta property="og:description" content="Split a Kotlin Multiplatform project into feature and layer modules, set dependency rules, use Gradle convention plugins, wire Koin, and ship one iOS framework." />
+  <link rel="canonical" href="https://androidwithhimanshu.com/blog/kmp-modularization" />
+  <meta property="og:url" content="https://androidwithhimanshu.com/blog/kmp-modularization" />
+  <meta property="og:site_name" content="Android with Himanshu" />
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#0b0a12" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css?v=e4a88e17" />
+  <link rel="stylesheet" href="article.css?v=d421b91f" />
+  <script>document.documentElement.classList.add("js")</script>
+</head>
+<body>
+  <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav" id="nav">
+    <div class="container nav__inner">
+      <a href="../index.html" class="logo" aria-label="Android with Himanshu, home">
+        <span class="logo__mark" aria-hidden="true">&lt;/&gt;</span>
+        <span class="logo__text">android<span class="dim">with</span>himanshu</span>
+      </a>
+      <nav class="nav__links" id="nav-links">
+        <a href="../index.html#paths">Find your path</a>
+        <a href="../index.html#courses">Courses</a>
+        <a href="../books/index.html">Books</a>
+        <a href="index.html">Blog</a>
+        <a href="../index.html#about">About</a>
+      </nav>
+      <div class="nav__cta">
+        <a href="https://ezylern.com" class="btn btn--ghost btn--sm">Student login</a>
+        <a href="../index.html#courses" class="btn btn--primary btn--sm">Start learning</a>
+      </div>
+      <button class="nav__toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ ARTICLE HEADER ============ -->
+    <header class="post-hero">
+      <div class="hero__glow" aria-hidden="true"></div>
+      <div class="container container--article">
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="../index.html">Home</a><span>/</span><a href="index.html">Blog</a><span>/</span><span aria-current="page">KMP modularization</span>
+        </nav>
+        <div class="post-hero__tags">
+          <span class="tag tag--purple">Kotlin Multiplatform</span>
+          <span class="tag tag--orange">Gradle</span>
+        </div>
+        <h1>Kotlin Multiplatform modularization: <span class="grad">structure a KMP project</span> that scales</h1>
+        <p class="post-hero__lead">One giant <code>shared</code> module works for the first few screens. Then builds slow down and everything depends on everything. Here's how to split a KMP project into features, layers and core modules, and keep it clean as it grows.</p>
+        <div class="byline">
+          <img src="../me.webp" alt="" width="44" height="44" />
+          <div>
+            <strong>Himanshu Gaur</strong>
+            <span><time datetime="2026-10-25">25 Oct 2026</time> · <span id="read-time">6 min read</span></span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="container article-layout">
+      <!-- ============ TABLE OF CONTENTS ============ -->
+      <aside class="toc" aria-label="On this page">
+        <p class="toc__title">On this page</p>
+        <ol>
+          <li><a href="#tldr">The 30-second answer</a></li>
+          <li><a href="#why">Why modularize?</a></li>
+          <li><a href="#structure">The structure</a></li>
+          <li><a href="#rules">Dependency rules</a></li>
+          <li><a href="#convention">Convention plugins</a></li>
+          <li><a href="#di">Wiring it with Koin</a></li>
+          <li><a href="#ios">What about iOS?</a></li>
+          <li><a href="#mistakes">Common mistakes</a></li>
+          <li><a href="#checklist">Checklist</a></li>
+        </ol>
+      </aside>
+
+      <!-- ============ ARTICLE BODY ============ -->
+      <article class="prose" id="article">
+        <section id="tldr" data-toc="The 30-second answer">
+          <div class="tldr">
+            <p class="tldr__label">TL;DR</p>
+            <ul>
+              <li>Split your KMP project by <strong>feature</strong> (games, favorites, profile) and by <strong>layer</strong> inside each feature (presentation, domain, data).</li>
+              <li>Shared infrastructure lives in <strong>core</strong> modules: network, database, design system, common utilities.</li>
+              <li>Follow two rules: <strong>features never depend on other features</strong>, and <strong>domain depends on nothing</strong> except core:common.</li>
+              <li>Move repeated Gradle setup into <strong>convention plugins</strong>, so a new module takes a few lines instead of 80.</li>
+              <li>Ship <strong>one</strong> iOS framework from the app module. Don't turn every module into its own framework.</li>
+            </ul>
+          </div>
+          <p>
+            Every KMP project starts the same way: one <code>shared</code> module where everything goes. It's perfect for the
+            first few screens. Then the app grows, builds slow down, and a change to one screen recompiles everything.
+            Here's how to split a Kotlin Multiplatform project into modules that scale, and the rules that keep it clean.
+          </p>
+        </section>
+
+        <a class="video-plug" href="https://www.youtube.com/watch?v=xbF6nTpltXw" data-yt="xbF6nTpltXw" data-title="Kotlin Multiplatform Modularization: Build a Scalable KMP Multi-Module Project">
+          <span class="video-plug__thumb"><img src="https://i.ytimg.com/vi/xbF6nTpltXw/hqdefault.jpg" alt="" width="480" height="360" loading="lazy" /><span class="vcard__play" aria-hidden="true"></span></span>
+          <span class="video-plug__text"><span class="video-plug__label">Prefer video?</span><span class="video-plug__title">Kotlin Multiplatform Modularization: build a scalable KMP multi-module project (2 hours)</span></span>
+        </a>
+
+        <section id="why" data-toc="Why modularize?">
+          <h2><span class="h-num">01</span> Why modularize at all?</h2>
+          <p>A single <code>shared</code> module works until it doesn't. Splitting it up gives you four concrete wins:</p>
+          <div class="choose">
+            <div class="choose__card">
+              <span class="choose__emoji" aria-hidden="true">⚡</span>
+              <h3>Faster builds</h3>
+              <p>Gradle only recompiles modules that changed, and their dependents. Touch one feature, rebuild one feature.</p>
+            </div>
+            <div class="choose__card">
+              <span class="choose__emoji" aria-hidden="true">🧱</span>
+              <h3>Real boundaries</h3>
+              <p>If <code>presentation</code> can't see <code>data</code>, nobody can call the database from a screen "just this once".</p>
+            </div>
+            <div class="choose__card">
+              <span class="choose__emoji" aria-hidden="true">👥</span>
+              <h3>Team ownership</h3>
+              <p>Different people can own different features without merge conflicts in one giant module.</p>
+            </div>
+          </div>
+          <p style="margin-top: 22px">
+            The fourth win is specific to KMP: modules make it obvious which code is <strong>truly shared</strong> and which is
+            platform-specific, because each module declares its own targets and source sets.
+          </p>
+        </section>
+
+        <section id="structure" data-toc="The structure">
+          <h2><span class="h-num">02</span> The structure: features × layers</h2>
+          <p>This is the layout I use for real KMP apps, like Gamopedia in my Compose Multiplatform course:</p>
+<pre class="codeblock" data-lang="text" data-file="Project structure"><code>gamopedia/
+├── composeApp/            ← app entry: Android, Desktop, iOS framework
+├── iosApp/                ← Xcode project, calls into composeApp
+├── build-logic/
+│   └── convention/        ← shared Gradle setup (convention plugins)
+├── core/
+│   ├── common/            ← dispatchers, Result types, utilities
+│   ├── network/           ← Ktor HttpClient setup
+│   ├── database/          ← SQLDelight driver and schema
+│   └── designsystem/      ← theme, colors, shared components
+└── feature/
+    ├── games/
+    │   ├── domain/        ← models, repository interfaces, use cases
+    │   ├── data/          ← repository implementations, DTOs, mappers
+    │   └── presentation/  ← screens and ViewModels
+    └── favorites/
+        ├── domain/
+        ├── data/
+        └── presentation/</code></pre>
+          <p>Each layer has one job:</p>
+          <ul class="checks">
+            <li><strong>domain</strong>: pure Kotlin. Models, repository <em>interfaces</em> and use cases. No Ktor, no SQLDelight, no Compose.</li>
+            <li><strong>data</strong>: implements the domain interfaces using core:network and core:database. DTOs never leave this module.</li>
+            <li><strong>presentation</strong>: Compose Multiplatform screens and ViewModels. Talks only to the domain layer.</li>
+          </ul>
+          <div class="callout">
+            <span class="callout__icon" aria-hidden="true">💡</span>
+            <p><strong>Start smaller.</strong> For a new app, one module per feature (with packages for the layers) is fine. Split a feature into domain, data and presentation when it grows or gets a second developer.</p>
+          </div>
+        </section>
+
+        <section id="rules" data-toc="Dependency rules">
+          <h2><span class="h-num">03</span> The dependency rules (explore them)</h2>
+          <p>Modules are only useful if the arrows point the right way. Tap any module to see what it contains, what it may depend on, and what it must <em>never</em> depend on.</p>
+
+          <div class="mexp" id="module-explorer">
+            <div class="mexp__map">
+              <div class="mexp__group">
+                <span class="mexp__label">App</span>
+                <button type="button" class="mexp__mod" data-mod="app">composeApp</button>
+              </div>
+              <div class="mexp__group mexp__group--features">
+                <span class="mexp__label">Features</span>
+                <div class="mexp__cols">
+                  <div class="mexp__col">
+                    <button type="button" class="mexp__mod" data-mod="games-presentation">games:presentation</button>
+                    <button type="button" class="mexp__mod" data-mod="games-domain">games:domain</button>
+                    <button type="button" class="mexp__mod" data-mod="games-data">games:data</button>
+                  </div>
+                  <div class="mexp__col">
+                    <button type="button" class="mexp__mod" data-mod="fav-presentation">favorites:presentation</button>
+                    <button type="button" class="mexp__mod" data-mod="fav-domain">favorites:domain</button>
+                    <button type="button" class="mexp__mod" data-mod="fav-data">favorites:data</button>
+                  </div>
+                </div>
+              </div>
+              <div class="mexp__group">
+                <span class="mexp__label">Core</span>
+                <div class="mexp__row">
+                  <button type="button" class="mexp__mod" data-mod="core-designsystem">designsystem</button>
+                  <button type="button" class="mexp__mod" data-mod="core-network">network</button>
+                  <button type="button" class="mexp__mod" data-mod="core-database">database</button>
+                  <button type="button" class="mexp__mod" data-mod="core-common">common</button>
+                </div>
+              </div>
+            </div>
+            <div class="mexp__info" aria-live="polite">
+              <p class="mexp__name" id="mexp-name">Tap a module</p>
+              <p class="mexp__what" id="mexp-what">Green modules are allowed dependencies. Red ones are forbidden.</p>
+              <div class="mexp__legend"><span class="ok">Allowed</span><span class="no">Forbidden</span></div>
+            </div>
+          </div>
+
+          <p>The two rules that matter most:</p>
+          <ol class="steps">
+            <li><strong>Features never depend on other features.</strong> If games needs something from favorites, move it into a core module or a small shared domain module. Otherwise you end up with circular dependencies and lose the build-speed win.</li>
+            <li><strong>Domain depends on nothing</strong> except core:common. That keeps your business logic easy to test in <code>commonTest</code> and impossible to tangle with frameworks.</li>
+          </ol>
+          <p>
+            Only the <strong>app module</strong> sees everything. It wires features together: navigation between screens, and
+            the dependency injection graph.
+          </p>
+        </section>
+
+        <section id="convention" data-toc="Convention plugins">
+          <h2><span class="h-num">04</span> Stop copy-pasting Gradle: convention plugins</h2>
+          <p>
+            With ten modules, you'll have ten nearly identical <code>build.gradle.kts</code> files: the same targets, the same
+            Android SDK levels, the same dependencies. A <strong>convention plugin</strong> puts that setup in one place.
+          </p>
+          <p>First, include a <code>build-logic</code> build and turn on type-safe project accessors:</p>
+<pre class="codeblock" data-lang="kotlin" data-file="settings.gradle.kts"><code>pluginManagement {
+    includeBuild("build-logic")
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+// Lets you write projects.core.network instead of project(":core:network")
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+include(":composeApp")
+include(":core:common", ":core:network", ":core:database", ":core:designsystem")
+include(":feature:games:domain", ":feature:games:data", ":feature:games:presentation")
+include(":feature:favorites:domain", ":feature:favorites:data", ":feature:favorites:presentation")</code></pre>
+          <p>Then write the plugin once:</p>
+<pre class="codeblock" data-lang="kotlin" data-file="build-logic/convention/src/main/kotlin/KmpLibraryConventionPlugin.kt"><code>class KmpLibraryConventionPlugin : Plugin&lt;Project&gt; {
+    override fun apply(target: Project) = with(target) {
+        with(pluginManager) {
+            apply("org.jetbrains.kotlin.multiplatform")
+            apply("com.android.library")
+        }
+
+        extensions.configure&lt;KotlinMultiplatformExtension&gt; {
+            androidTarget()
+            iosX64()
+            iosArm64()
+            iosSimulatorArm64()
+            jvm("desktop")
+        }
+
+        extensions.configure&lt;LibraryExtension&gt; {
+            compileSdk = 35
+            defaultConfig.minSdk = 24
+            // Namespace from the module path, e.g. com.example.feature.games.data
+            namespace = "com.example" + path.replace(':', '.').replace('-', '_')
+        }
+    }
+}</code></pre>
+<pre class="codeblock" data-lang="kotlin" data-file="build-logic/convention/build.gradle.kts"><code>plugins {
+    `kotlin-dsl`
+}
+
+dependencies {
+    compileOnly(libs.android.gradlePlugin)
+    compileOnly(libs.kotlin.gradlePlugin)
+}
+
+gradlePlugin {
+    plugins {
+        register("kmpLibrary") {
+            id = "awh.kmp.library"
+            implementationClass = "KmpLibraryConventionPlugin"
+        }
+    }
+}</code></pre>
+          <p>Now every module's build file is tiny and only says what's <em>different</em> about it:</p>
+<pre class="codeblock" data-lang="kotlin" data-file="feature/games/data/build.gradle.kts"><code>plugins {
+    id("awh.kmp.library")
+}
+
+kotlin {
+    sourceSets.commonMain.dependencies {
+        implementation(projects.feature.games.domain)
+        implementation(projects.core.network)
+        implementation(projects.core.database)
+    }
+}</code></pre>
+          <div class="callout">
+            <span class="callout__icon" aria-hidden="true">📌</span>
+            <p>Newer Android Gradle Plugin versions add a dedicated <code>com.android.kotlin.multiplatform.library</code> plugin for KMP modules. The idea is the same: whichever plugin your project template uses, configure it once in the convention plugin.</p>
+          </div>
+        </section>
+
+        <section id="di" data-toc="Wiring it with Koin">
+          <h2><span class="h-num">05</span> Wiring it together with Koin</h2>
+          <p>Each module exposes its own Koin module, and the data layer binds its implementations to the domain interfaces:</p>
+<pre class="codeblock" data-lang="kotlin" data-file="feature/games/data · GamesDataModule.kt"><code>val gamesDataModule = module {
+    singleOf(::GameRepositoryImpl) bind GameRepository::class
+}</code></pre>
+<pre class="codeblock" data-lang="kotlin" data-file="feature/games/presentation · GamesPresentationModule.kt"><code>val gamesPresentationModule = module {
+    viewModelOf(::GameListViewModel)
+    viewModelOf(::GameDetailViewModel)
+}</code></pre>
+          <p>The app module is the only place that knows about every module, so it starts Koin with all of them:</p>
+<pre class="codeblock" data-lang="kotlin" data-file="composeApp/commonMain · InitKoin.kt"><code>fun initKoin(config: KoinAppDeclaration? = null) = startKoin {
+    config?.invoke(this)
+    modules(
+        networkModule,
+        databaseModule,
+        gamesDataModule,
+        gamesPresentationModule,
+        favoritesDataModule,
+        favoritesPresentationModule,
+    )
+}</code></pre>
+          <p>
+            Notice that <code>games:presentation</code> asks for a <code>GameRepository</code> interface. It never learns that
+            <code>GameRepositoryImpl</code> exists. That's the boundary doing its job.
+          </p>
+        </section>
+
+        <section id="ios" data-toc="What about iOS?">
+          <h2><span class="h-num">06</span> What about iOS?</h2>
+          <p>
+            This trips up a lot of teams: <strong>don't make every module its own iOS framework.</strong> Each Kotlin framework
+            carries its own copy of the Kotlin runtime, and types from one framework aren't the same types as in another, so
+            a <code>Game</code> from framework A can't be passed to framework B.
+          </p>
+          <p>
+            Instead, the <strong>app module produces one framework</strong> (often called <code>ComposeApp</code> or <code>Shared</code>),
+            and every feature and core module is simply a dependency of it. If Swift code needs to see a type from a library
+            module, <code>export</code> just that module:
+          </p>
+<pre class="codeblock" data-lang="kotlin" data-file="composeApp/build.gradle.kts"><code>kotlin {
+    listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach { target -&gt;
+        target.binaries.framework {
+            baseName = "ComposeApp"
+            isStatic = true
+            // Only if Swift needs these types directly
+            export(projects.feature.games.domain)
+        }
+    }
+
+    sourceSets.commonMain.dependencies {
+        implementation(projects.feature.games.presentation)
+        implementation(projects.feature.favorites.presentation)
+        api(projects.feature.games.domain) // required for export()
+    }
+}</code></pre>
+          <p>With Compose Multiplatform UI, Swift usually needs almost nothing: one function that returns the root view controller.</p>
+        </section>
+
+        <section id="mistakes" data-toc="Common mistakes">
+          <h2><span class="h-num">07</span> Common mistakes</h2>
+          <div class="myths">
+            <details open>
+              <summary><span class="myth-tag">Mistake</span> Feature modules depending on each other.</summary>
+              <p>It starts with one import and ends with circular dependencies and a build that recompiles half the app. Move the shared piece to core, and let the app module handle navigation between features.</p>
+            </details>
+            <details>
+              <summary><span class="myth-tag">Mistake</span> A "core" module that holds everything.</summary>
+              <p>If <code>core</code> contains networking, database, UI components and business logic, you've just renamed <code>shared</code>. Keep core modules small and focused on one concern each.</p>
+            </details>
+            <details>
+              <summary><span class="myth-tag">Mistake</span> DTOs leaking into the UI.</summary>
+              <p>If a screen uses <code>GameDto</code> straight from the API, every backend change breaks your UI. Map DTOs to domain models inside the data module.</p>
+            </details>
+            <details>
+              <summary><span class="myth-tag">Mistake</span> Splitting too early.</summary>
+              <p>Thirty modules for a five-screen app adds Gradle overhead with no benefit. Start with features, then split layers when a feature grows.</p>
+            </details>
+          </div>
+        </section>
+
+        <section id="checklist" data-toc="Checklist">
+          <h2><span class="h-num">08</span> Your KMP modularization checklist</h2>
+          <ul class="checks">
+            <li>Features split by <strong>feature</strong>, then by <strong>layer</strong> when they grow</li>
+            <li>Shared infrastructure in small, focused <code>core</code> modules</li>
+            <li>No feature-to-feature dependencies</li>
+            <li>Domain modules are pure Kotlin and depend only on core:common</li>
+            <li>Convention plugins in <code>build-logic</code> instead of copy-pasted Gradle</li>
+            <li>One Koin module per module, assembled in the app</li>
+            <li>One iOS framework, from the app module</li>
+          </ul>
+
+          <div class="course-cta">
+            <div class="course-cta__glow" aria-hidden="true"></div>
+            <div class="course-cta__body">
+              <p class="kicker">Build it for real</p>
+              <h3>Compose Multiplatform: Build Gamopedia</h3>
+              <p>Build a feature + layer modularized KMP app with Koin, Ktor Client and SQLDelight, and run it on Android, iOS and Desktop.</p>
+              <div class="course-cta__actions">
+                <a href="https://ezylern.com/course/gamopedia-build-a-cross-platform-gaming-app-with-compose-multiplatform" class="btn btn--primary">View the course →</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="article-book">
+        <a class="book-plug" href="../books/index.html#book-kotlin">
+          <div class="book"><div class="cover cover--img"><img src="../books/covers/kotlin.webp" alt="Kotlin Interview Questions &amp; Answers book cover" width="600" height="833" loading="lazy" decoding="async" /></div></div>
+          <span class="book-plug__text">
+            <span class="book-plug__label">Go deeper for interviews</span>
+            <span class="book-plug__title">Kotlin Interview Questions &amp; Answers</span>
+            <span class="book-plug__desc">140+ real questions with code examples, from junior to senior.</span>
+          </span>
+        </a>
+        </div>
+
+        <!-- Author -->
+        <aside class="author">
+          <img src="../me.webp" alt="Himanshu Gaur" width="72" height="72" loading="lazy" />
+          <div>
+            <p class="author__name">Written by Himanshu Gaur</p>
+            <p>Android developer building production apps with Kotlin, Kotlin Multiplatform and Ktor. I teach the stuff I wish someone had explained to me, with real code.</p>
+            <a href="index.html" class="link-arrow">More articles →</a>
+          </div>
+        </aside>
+      </article>
+    </div>
+
+    <!-- ============ NEWSLETTER ============ -->
+    <section class="section cta" id="newsletter">
+      <div class="container">
+        <div class="cta__box reveal">
+          <div class="cta__glow" aria-hidden="true"></div>
+          <h2>Get one practical Kotlin tip every week.</h2>
+          <p class="sub">Short, useful, no spam. Plus early access to new courses.</p>
+          <!-- REPLACE: point this form at your email provider -->
+          <form class="signup" id="signup" action="#" method="post">
+            <label class="sr-only" for="email">Email address</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" required autocomplete="email" />
+            <button class="btn btn--primary" type="submit">Join free</button>
+          </form>
+          <p class="signup__msg" id="signup-msg" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <a href="../index.html" class="logo">
+        <span class="logo__mark" aria-hidden="true">&lt;/&gt;</span>
+        <span class="logo__text">android<span class="dim">with</span>himanshu</span>
+      </a>
+      <nav>
+        <a href="../index.html#courses">Courses</a>
+        <a href="../books/index.html">Books</a>
+        <a href="index.html">Blog</a>
+        <a href="../index.html#about">About</a>
+        <a href="https://ezylern.com">Student login</a>
+      </nav>
+      <p class="dim">© <span id="year"></span> Himanshu Gaur. Built with Kotlin on the brain.</p>
+    </div>
+  </footer>
+
+  <script src="article.js?v=6ebf0db9"></script>
+  <script src="../video.js?v=3895d9b5"></script>
+</body>
+</html>

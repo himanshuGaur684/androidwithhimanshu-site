@@ -267,6 +267,42 @@
     run("list");
   }
 
+  /* ---------- KMP module explorer: tap a module to see its allowed dependencies ---------- */
+  const mexp = document.getElementById("module-explorer");
+  if (mexp) {
+    const MODS = {
+      app: ["composeApp", "Entry points for Android, Desktop and the iOS framework. Owns navigation between features and starts Koin with every module.", "*"],
+      "games-presentation": ["feature:games:presentation", "Compose Multiplatform screens and ViewModels for the games feature.", ["games-domain", "core-designsystem", "core-common"]],
+      "games-domain": ["feature:games:domain", "Pure Kotlin: the Game model, the GameRepository interface and use cases. No frameworks.", ["core-common"]],
+      "games-data": ["feature:games:data", "GameRepositoryImpl, API DTOs, database queries and the mappers between them.", ["games-domain", "core-network", "core-database", "core-common"]],
+      "fav-presentation": ["feature:favorites:presentation", "Screens and ViewModels for favorites.", ["fav-domain", "core-designsystem", "core-common"]],
+      "fav-domain": ["feature:favorites:domain", "Pure Kotlin: favorites models, repository interface and use cases.", ["core-common"]],
+      "fav-data": ["feature:favorites:data", "Stores favorites locally with SQLDelight.", ["fav-domain", "core-database", "core-common"]],
+      "core-designsystem": ["core:designsystem", "Theme, colors, typography and shared Compose components. Knows nothing about features.", []],
+      "core-network": ["core:network", "The configured Ktor HttpClient: JSON, logging, timeouts, auth.", ["core-common"]],
+      "core-database": ["core:database", "SQLDelight schema and the platform drivers (expect/actual).", ["core-common"]],
+      "core-common": ["core:common", "Dispatchers, Result types and small utilities used everywhere.", []],
+    };
+    const buttons = mexp.querySelectorAll(".mexp__mod");
+    const select = (key) => {
+      const [name, what, deps] = MODS[key];
+      const ok = deps === "*" ? Object.keys(MODS).filter((k) => k !== key) : deps;
+      buttons.forEach((b) => {
+        const k = b.dataset.mod;
+        b.classList.toggle("is-sel", k === key);
+        b.classList.toggle("is-ok", k !== key && ok.includes(k));
+        b.classList.toggle("is-no", k !== key && !ok.includes(k));
+        b.setAttribute("aria-pressed", String(k === key));
+      });
+      document.getElementById("mexp-name").textContent = name;
+      const okNames = ok.map((k) => MODS[k][0]);
+      document.getElementById("mexp-what").textContent =
+        `${what} ${ok.length ? `Can depend on: ${deps === "*" ? "every module" : okNames.join(", ")}.` : "Depends on no other project module."}`;
+    };
+    buttons.forEach((b) => b.addEventListener("click", () => select(b.dataset.mod)));
+    select("games-presentation");
+  }
+
   /* ---------- Scroll reveal ---------- */
   const io = new IntersectionObserver(
     (entries) =>
