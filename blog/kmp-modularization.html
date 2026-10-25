@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../styles.css?v=e4a88e17" />
-  <link rel="stylesheet" href="article.css?v=d421b91f" />
+  <link rel="stylesheet" href="article.css?v=298a95cd" />
   <script>document.documentElement.classList.add("js")</script>
 </head>
 <body>
@@ -60,12 +60,12 @@
           <span class="tag tag--orange">Gradle</span>
         </div>
         <h1>Kotlin Multiplatform modularization: <span class="grad">structure a KMP project</span> that scales</h1>
-        <p class="post-hero__lead">One giant <code>shared</code> module works for the first few screens. Then builds slow down and everything depends on everything. Here's how to split a KMP project into features, layers and core modules, and keep it clean as it grows.</p>
+        <p class="post-hero__lead">One giant <code>shared</code> module works for the first few screens. Then builds slow down and everything depends on everything. This guide explains what modules are, why they matter and how to split a KMP project step by step. No prior Gradle expertise needed.</p>
         <div class="byline">
           <img src="../me.webp" alt="" width="44" height="44" />
           <div>
             <strong>Himanshu Gaur</strong>
-            <span><time datetime="2026-10-25">25 Oct 2026</time> · <span id="read-time">6 min read</span></span>
+            <span><time datetime="2026-10-25">25 Oct 2026</time> · <span id="read-time">9 min read</span></span>
           </div>
         </div>
       </div>
@@ -77,6 +77,7 @@
         <p class="toc__title">On this page</p>
         <ol>
           <li><a href="#tldr">The 30-second answer</a></li>
+          <li><a href="#basics">New here? The basics</a></li>
           <li><a href="#why">Why modularize?</a></li>
           <li><a href="#structure">The structure</a></li>
           <li><a href="#rules">Dependency rules</a></li>
@@ -84,6 +85,7 @@
           <li><a href="#di">Wiring it with Koin</a></li>
           <li><a href="#ios">What about iOS?</a></li>
           <li><a href="#mistakes">Common mistakes</a></li>
+          <li><a href="#glossary">Glossary</a></li>
           <li><a href="#checklist">Checklist</a></li>
         </ol>
       </aside>
@@ -112,6 +114,76 @@
           <span class="video-plug__thumb"><img src="https://i.ytimg.com/vi/xbF6nTpltXw/hqdefault.jpg" alt="" width="480" height="360" loading="lazy" /><span class="vcard__play" aria-hidden="true"></span></span>
           <span class="video-plug__text"><span class="video-plug__label">Prefer video?</span><span class="video-plug__title">Kotlin Multiplatform Modularization: build a scalable KMP multi-module project (2 hours)</span></span>
         </a>
+
+        <section id="basics" data-toc="New here? The basics">
+          <h2><span class="h-num">00</span> New here? The basics, in plain words</h2>
+          <div class="callout">
+            <span class="callout__icon" aria-hidden="true">🧭</span>
+            <p><strong>Who this is for:</strong> you can build a simple Android app in Kotlin, and you've heard of Kotlin Multiplatform (KMP). If KMP itself is new to you, read <a href="compose-vs-kotlin-multiplatform.html">Compose vs Kotlin Multiplatform</a> first. It takes 5 minutes.</p>
+          </div>
+
+          <h3 class="sub-h">What is a module?</h3>
+          <p>
+            Think of your app as a <strong>house</strong>. When you start a KMP project, the template gives you one big room called
+            <code>shared</code>, and everything goes in there: screens, network calls, database code, helpers. That's fine for a small flat.
+            But as the house grows, one giant room gets messy, and every time you repaint one corner, the whole room has to dry again.
+          </p>
+          <p>
+            A <strong>module</strong> is a <strong>separate room with a door</strong>. Technically, it's a folder with its own
+            <code>build.gradle.kts</code> file. Gradle, the tool that builds your app, compiles each module on its own, and a module can only
+            use code from the modules it lists as dependencies.
+          </p>
+          <div class="compare">
+            <div class="compare__card compare__card--bad">
+              <p class="compare__label">Before: one module</p>
+              <div class="compare__box">shared<small>screens · ViewModels · API calls · database · utils · everything</small></div>
+              <p class="compare__note">Change one screen → rebuild everything. Anything can call anything.</p>
+            </div>
+            <div class="compare__card compare__card--good">
+              <p class="compare__label">After: many small modules</p>
+              <div class="compare__boxes">
+                <div class="compare__box">games</div><div class="compare__box">favorites</div>
+                <div class="compare__box">network</div><div class="compare__box">database</div>
+              </div>
+              <p class="compare__note">Change one screen → rebuild one module. Each module has one job.</p>
+            </div>
+          </div>
+          <p>Here's what one module looks like on disk. In KMP, each module has a folder per platform, called a <strong>source set</strong>:</p>
+<pre class="codeblock" data-lang="text" data-file="One module on disk"><code>feature/games/data/
+├── build.gradle.kts           ← this module's settings and dependencies
+└── src/
+    ├── commonMain/kotlin/     ← shared code: runs on Android, iOS and Desktop
+    ├── androidMain/kotlin/    ← Android-only code (if needed)
+    └── iosMain/kotlin/        ← iOS-only code (if needed)</code></pre>
+
+          <h3 class="sub-h">What does "depends on" mean?</h3>
+          <p>
+            If module <strong>A depends on B</strong>, code in A can use classes and functions from B. It only works in one direction:
+            B can't see A. You declare it in A's <code>build.gradle.kts</code> with a line like <code>implementation(projects.core.network)</code>.
+            The whole point of modularization is choosing these arrows carefully.
+          </p>
+
+          <h3 class="sub-h">What are "layers"?</h3>
+          <p>Inside each feature, we split code by its job. A restaurant is a good way to picture it:</p>
+          <div class="choose">
+            <div class="choose__card">
+              <span class="choose__emoji" aria-hidden="true">🧑‍🍳</span>
+              <h3>presentation = the waiter</h3>
+              <p>Talks to the customer: <strong>screens and ViewModels</strong>. Takes orders and shows results, but never cooks.</p>
+            </div>
+            <div class="choose__card">
+              <span class="choose__emoji" aria-hidden="true">📖</span>
+              <h3>domain = the menu</h3>
+              <p>The <strong>rules</strong> of the business: what a Game is, what you can do with it. Doesn't care where ingredients come from.</p>
+            </div>
+            <div class="choose__card">
+              <span class="choose__emoji" aria-hidden="true">🥫</span>
+              <h3>data = the kitchen</h3>
+              <p>Fetches the ingredients: <strong>API calls and the database</strong>. The waiter never walks into the pantry.</p>
+            </div>
+          </div>
+          <p style="margin-top: 22px">Keep this picture in mind. Everything below is just these three ideas, applied carefully: <strong>rooms</strong>, <strong>doors</strong> and <strong>jobs</strong>.</p>
+        </section>
 
         <section id="why" data-toc="Why modularize?">
           <h2><span class="h-num">01</span> Why modularize at all?</h2>
@@ -232,7 +304,11 @@
             With ten modules, you'll have ten nearly identical <code>build.gradle.kts</code> files: the same targets, the same
             Android SDK levels, the same dependencies. A <strong>convention plugin</strong> puts that setup in one place.
           </p>
-          <p>First, include a <code>build-logic</code> build and turn on type-safe project accessors:</p>
+          <div class="callout callout--accent">
+            <span class="callout__icon" aria-hidden="true">🍪</span>
+            <p><strong>In plain words:</strong> a convention plugin is a <strong>cookie cutter</strong> for modules. You describe once how a KMP module should be set up (which platforms, which Android version), give it a name like <code>awh.kmp.library</code>, and every module just says "use that cutter".</p>
+          </div>
+          <p>It takes three steps. <strong>Step 1:</strong> in <code>settings.gradle.kts</code> (the file that lists every module in your project), tell Gradle about a separate <code>build-logic</code> folder where the plugin lives:</p>
 <pre class="codeblock" data-lang="kotlin" data-file="settings.gradle.kts"><code>pluginManagement {
     includeBuild("build-logic")
     repositories {
@@ -249,7 +325,7 @@ include(":composeApp")
 include(":core:common", ":core:network", ":core:database", ":core:designsystem")
 include(":feature:games:domain", ":feature:games:data", ":feature:games:presentation")
 include(":feature:favorites:domain", ":feature:favorites:data", ":feature:favorites:presentation")</code></pre>
-          <p>Then write the plugin once:</p>
+          <p><strong>Step 2:</strong> write the plugin. Don't worry about every line. Read it as a list of instructions: "apply the KMP and Android plugins, target Android, iOS and Desktop, and use these Android settings."</p>
 <pre class="codeblock" data-lang="kotlin" data-file="build-logic/convention/src/main/kotlin/KmpLibraryConventionPlugin.kt"><code>class KmpLibraryConventionPlugin : Plugin&lt;Project&gt; {
     override fun apply(target: Project) = with(target) {
         with(pluginManager) {
@@ -273,6 +349,7 @@ include(":feature:favorites:domain", ":feature:favorites:data", ":feature:favori
         }
     }
 }</code></pre>
+<p><strong>Step 3:</strong> register the plugin under a name, so modules can use it:</p>
 <pre class="codeblock" data-lang="kotlin" data-file="build-logic/convention/build.gradle.kts"><code>plugins {
     `kotlin-dsl`
 }
@@ -290,7 +367,7 @@ gradlePlugin {
         }
     }
 }</code></pre>
-          <p>Now every module's build file is tiny and only says what's <em>different</em> about it:</p>
+          <p>The payoff: every module's build file is now tiny and only says what's <em>different</em> about it, here just "which other modules do I need?":</p>
 <pre class="codeblock" data-lang="kotlin" data-file="feature/games/data/build.gradle.kts"><code>plugins {
     id("awh.kmp.library")
 }
@@ -310,7 +387,11 @@ kotlin {
 
         <section id="di" data-toc="Wiring it with Koin">
           <h2><span class="h-num">05</span> Wiring it together with Koin</h2>
-          <p>Each module exposes its own Koin module, and the data layer binds its implementations to the domain interfaces:</p>
+          <div class="callout callout--accent">
+            <span class="callout__icon" aria-hidden="true">🔌</span>
+            <p><strong>In plain words:</strong> a screen needs a repository, but it shouldn't build one itself (it can't even see the data module). <strong>Dependency injection</strong> means something else creates objects and hands them over. <strong>Koin</strong> is a popular, beginner-friendly library that does this in KMP. You write small "recipes" for how to create things, and Koin follows them.</p>
+          </div>
+          <p>Each module writes its own recipes. Here the data module says: "when someone asks for a <code>GameRepository</code>, give them a <code>GameRepositoryImpl</code>":</p>
 <pre class="codeblock" data-lang="kotlin" data-file="feature/games/data · GamesDataModule.kt"><code>val gamesDataModule = module {
     singleOf(::GameRepositoryImpl) bind GameRepository::class
 }</code></pre>
@@ -338,6 +419,10 @@ kotlin {
 
         <section id="ios" data-toc="What about iOS?">
           <h2><span class="h-num">06</span> What about iOS?</h2>
+          <div class="callout callout--accent">
+            <span class="callout__icon" aria-hidden="true">🍎</span>
+            <p><strong>In plain words:</strong> iOS apps are written in Swift and built with Xcode, which can't read Kotlin modules directly. So KMP compiles your Kotlin code into a <strong>framework</strong>, a ready-made package that Xcode can plug in, like a library.</p>
+          </div>
           <p>
             This trips up a lot of teams: <strong>don't make every module its own iOS framework.</strong> Each Kotlin framework
             carries its own copy of the Kotlin runtime, and types from one framework aren't the same types as in another, so
@@ -389,8 +474,24 @@ kotlin {
           </div>
         </section>
 
+        <section id="glossary" data-toc="Glossary">
+          <h2><span class="h-num">08</span> Jargon buster</h2>
+          <p>Tap any term you're unsure about.</p>
+          <div class="myths glossary">
+            <details><summary>Gradle</summary><p>The build tool for Android and KMP projects. It compiles your code, downloads libraries and packages your app. You configure it with <code>.gradle.kts</code> files written in Kotlin.</p></details>
+            <details><summary>Module</summary><p>A folder with its own <code>build.gradle.kts</code>. Gradle builds it separately, and it can only use code from the modules it declares as dependencies.</p></details>
+            <details><summary>Source set (commonMain, androidMain, iosMain)</summary><p>Folders inside a KMP module. Code in <code>commonMain</code> is shared by every platform; code in <code>androidMain</code> or <code>iosMain</code> only runs on that platform.</p></details>
+            <details><summary>expect / actual</summary><p>A KMP feature for platform differences: you <em>expect</em> a function in common code, and provide the <em>actual</em> version for each platform.</p></details>
+            <details><summary>Interface vs implementation</summary><p>An interface (like <code>GameRepository</code>) is a promise: "I can give you games." The implementation (<code>GameRepositoryImpl</code>) is the code that actually keeps the promise. Screens only know the promise.</p></details>
+            <details><summary>DTO</summary><p>Data Transfer Object: a class shaped exactly like the JSON your API returns. It stays in the data layer and gets converted into a clean domain model.</p></details>
+            <details><summary>Dependency injection (DI) and Koin</summary><p>DI means objects receive what they need instead of creating it themselves. Koin is a lightweight DI library that works in KMP.</p></details>
+            <details><summary>Convention plugin</summary><p>Your own small Gradle plugin that holds shared module setup, so you don't copy the same configuration into every module.</p></details>
+            <details><summary>iOS framework</summary><p>The package KMP produces so an Xcode (Swift) project can use your Kotlin code.</p></details>
+          </div>
+        </section>
+
         <section id="checklist" data-toc="Checklist">
-          <h2><span class="h-num">08</span> Your KMP modularization checklist</h2>
+          <h2><span class="h-num">09</span> Your KMP modularization checklist</h2>
           <ul class="checks">
             <li>Features split by <strong>feature</strong>, then by <strong>layer</strong> when they grow</li>
             <li>Shared infrastructure in small, focused <code>core</code> modules</li>

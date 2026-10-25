@@ -280,3 +280,21 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 }
 /* Long inline code (like com.android.kotlin.multiplatform.library) may wrap on phones */
 .prose :not(pre) > code { overflow-wrap: anywhere; }
+
+/* Beginner-friendly extras */
+.prose .sub-h { font-size: 1.3rem; margin: 34px 0 12px; }
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 8px 0 26px; }
+.compare__card { padding: 18px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); display: grid; gap: 10px; align-content: start; }
+.compare__card--bad { border-color: rgba(228, 72, 87, .4); }
+.compare__card--good { border-color: rgba(61, 220, 132, .4); }
+.compare__label { font-family: var(--mono); font-size: .72rem; text-transform: uppercase; letter-spacing: .12em; margin: 0 !important; }
+.compare__card--bad .compare__label { color: #ff8b97; }
+.compare__card--good .compare__label { color: var(--green); }
+.compare__box { padding: 14px; border-radius: 10px; text-align: center; font-family: var(--mono); font-weight: 600; font-size: .9rem; background: var(--surface-2); border: 1px solid var(--line-2); color: var(--text); }
+.compare__box small { display: block; margin-top: 6px; font-family: var(--font); font-weight: 400; font-size: .78rem; color: var(--muted); }
+.compare__card--bad .compare__box { min-height: 112px; display: grid; place-content: center; }
+.compare__boxes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.compare__boxes .compare__box { padding: 12px 6px; font-size: .82rem; }
+.compare__note { font-size: .9rem; color: var(--muted); margin: 0 !important; }
+.glossary summary { font-weight: 600; }
+@media (max-width: 640px) { .compare { grid-template-columns: 1fr; } }
