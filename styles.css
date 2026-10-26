@@ -633,3 +633,6 @@ details p { padding: 0 24px 20px; color: var(--muted); margin: 0; }
 .vtabs button:hover { opacity: 1; background: rgba(255, 255, 255, .06); }
 .vtabs button[aria-selected="true"] { opacity: 1; box-shadow: 0 8px 24px -10px rgba(127, 82, 255, .8); }
 .vtabs button[lang="hi"] { font-family: "Noto Sans Devanagari", var(--font); }
+/* Five books on the homepage shelf */
+.books-strip__shelf { grid-template-columns: repeat(5, 1fr); gap: 14px; }
+@media (max-width: 640px) { .books-strip__shelf { grid-template-columns: repeat(3, 1fr); gap: 16px 12px; padding-inline: 0; } }

@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Android Interview Books — Android with Himanshu</title>
-  <meta name="description" content="Four in-depth interview prep books for Android developers: Kotlin, Jetpack Compose, Coroutines & Flow, and Core Android. 960+ questions with answers, from junior to senior." />
-  <meta property="og:title" content="Android Interview Books by Himanshu Gaur" />
+  <title>Books for Android &amp; KMP Developers — Android with Himanshu</title>
+  <meta name="description" content="Books for Android and KMP developers: SwiftUI for KMP Developers, plus four interview prep books on Kotlin, Jetpack Compose, Coroutines & Flow and Core Android. 960+ questions with answers, from junior to senior." />
+  <meta property="og:title" content="Books for Android &amp; KMP Developers by Himanshu Gaur" />
   <meta property="og:description" content="960+ real interview questions with in-depth answers on Kotlin, Compose, Coroutines & Flow and Core Android." />
   <link rel="canonical" href="https://androidwithhimanshu.com/books/" />
   <meta property="og:url" content="https://androidwithhimanshu.com/books/" />
@@ -15,8 +15,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../styles.css?v=e4a88e17" />
-  <link rel="stylesheet" href="books.css?v=ca7d5451" />
+  <link rel="stylesheet" href="../styles.css?v=1f3d8c1e" />
+  <link rel="stylesheet" href="books.css?v=1532036a" />
   <script>document.documentElement.classList.add("js")</script>
 </head>
 <body>
@@ -53,15 +53,15 @@
       <div class="hero__grid" aria-hidden="true"></div>
       <div class="container books-hero__inner">
         <div class="reveal">
-          <p class="eyebrow"><span class="pulse"></span> Android Interview Mastery series · on Amazon</p>
+          <a href="#book-swiftui" class="eyebrow eyebrow--new"><span class="pulse"></span> New book: SwiftUI for KMP Developers →</a>
           <h1>Walk into your next Android interview <span class="grad">ready.</span></h1>
           <p class="lead">
-            Four in-depth books with the real questions interviewers ask, and answers that explain the <em>why</em>,
-            not just the what. From your first junior role to senior.
+            In-depth books for Android and KMP developers: four interview prep books with the real questions interviewers ask,
+            and a new side-by-side guide to SwiftUI for developers who know Jetpack Compose.
           </p>
           <ul class="books-hero__stats">
-            <li><strong>4</strong> books</li>
-            <li><strong>960+</strong> questions</li>
+            <li><strong>5</strong> books</li>
+            <li><strong>960+</strong> interview questions</li>
             <li><strong>Junior → Senior</strong> every book</li>
           </ul>
           <div class="hero__ctas">
@@ -74,8 +74,54 @@
           <div class="book fan__b fan__b--1"><div class="cover cover--img"><img src="covers/kotlin.webp" alt="" width="600" height="833" decoding="async" /></div></div>
           <div class="book fan__b fan__b--2"><div class="cover cover--img"><img src="covers/compose.webp" alt="" width="600" height="833" decoding="async" /></div></div>
           <div class="book fan__b fan__b--3"><div class="cover cover--img"><img src="covers/coroutines.webp" alt="" width="600" height="833" decoding="async" /></div></div>
-          <div class="book fan__b fan__b--4"><div class="cover cover--img"><img src="covers/android.webp" alt="" width="600" height="833" loading="lazy" decoding="async" /></div></div>
+          <div class="book fan__b fan__b--4"><div class="cover cover--img"><img src="covers/android.webp" alt="" width="600" height="833" decoding="async" /></div></div>
+          <div class="book fan__b fan__b--5"><div class="cover cover--img"><img src="covers/swiftui.webp" alt="" width="600" height="833" decoding="async" /></div></div>
         </div>
+      </div>
+    </section>
+
+    <!-- ============ NEW BOOK ============ -->
+    <section class="section new-book" id="new">
+      <div class="container">
+        <!-- REPLACE the "Buy on Amazon" href with the book's Amazon link (it currently opens an Amazon search) -->
+        <article class="bk bk--featured reveal" id="book-swiftui">
+          <span class="ribbon">New</span>
+          <div class="bk__cover">
+            <div class="book"><div class="cover cover--img"><img src="covers/swiftui.webp" alt="SwiftUI for KMP Developers book cover" width="600" height="833" loading="lazy" decoding="async" /></div></div>
+          </div>
+          <div class="bk__body">
+            <div class="bk__tags"><span class="tag tag--orange">SwiftUI</span><span class="tag tag--purple">Kotlin Multiplatform</span><span class="bk__count">iOS 17+ · Swift 6 · Kotlin 2.x</span></div>
+            <h3>SwiftUI for KMP Developers</h3>
+            <p class="bk__sub">A Side-by-Side Guide to SwiftUI for Android Developers Who Know Jetpack Compose</p>
+            <p><strong>You already know most of SwiftUI.</strong> Your team adopted Kotlin Multiplatform, and half of your app's future moved into Xcode, in a language that looks almost like Kotlin, full of <code>@State</code>, <code>$bindings</code> and <code>some View</code>.</p>
+            <p>This book teaches SwiftUI the fastest way an Android developer can learn it: <strong>from Compose</strong>. Every topic starts with the Compose code you already write, shows the SwiftUI code that does the same job side by side, and explains exactly where the two differ.</p>
+            <div class="map" aria-label="Compose to SwiftUI examples">
+              <span><code>Column</code><i>→</i><code>VStack</code></span>
+              <span><code>remember</code><i>→</i><code>@State</code></span>
+              <span><code>LaunchedEffect</code><i>→</i><code>.task</code></span>
+              <span><code>CompositionLocal</code><i>→</i><code>@Environment</code></span>
+            </div>
+            <details class="bk__more">
+              <summary>What's inside</summary>
+              <ul class="checks">
+                <li>Swift and Xcode, explained through Kotlin and Android Studio</li>
+                <li>Layout, modifiers, lists and navigation, side by side with Compose</li>
+                <li>Modern SwiftUI state with <code>@Observable</code>, bindings and the environment</li>
+                <li>How Kotlin code looks from Swift, and using Flows and suspend functions with SKIE</li>
+                <li>Driving one shared Kotlin ViewModel from both Compose and SwiftUI</li>
+                <li>Dependency injection with Koin across Android and iOS</li>
+                <li>Testing, accessibility, performance and iOS design conventions</li>
+                <li>A complete app, <strong>Jotter</strong>, built twice: once in Compose, once in SwiftUI</li>
+                <li>A cheat sheet after every chapter, plus a full Compose-to-SwiftUI lookup table and a Kotlin-to-Swift syntax guide</li>
+              </ul>
+              <p class="bk__who"><strong>Who it's for:</strong> Android developers who know Kotlin and Jetpack Compose and need to build or understand native SwiftUI screens in a Kotlin Multiplatform app.</p>
+            </details>
+            <div class="bk__actions">
+              <a href="https://www.amazon.com/s?k=SwiftUI+for+KMP+Developers+Himanshu+Gaur" class="btn btn--primary" target="_blank" rel="noopener">Buy on Amazon <span aria-hidden="true">→</span></a>
+              <a href="https://ezylern.com/course/gamopedia-build-a-cross-platform-gaming-app-with-compose-multiplatform" class="bk__pair">Then build with it: <strong>Compose Multiplatform: Gamopedia</strong></a>
+            </div>
+          </div>
+        </article>
       </div>
     </section>
 
@@ -83,7 +129,7 @@
     <section class="section" id="books">
       <div class="container">
         <div class="section__head reveal">
-          <p class="kicker">The books</p>
+          <p class="kicker">The interview series</p>
           <h2>One book for every part of the interview.</h2>
           <p class="sub">Pick the topic you're weakest in, or get all four and cover the whole Android interview loop.</p>
         </div>
@@ -226,15 +272,15 @@
         <div class="faq__list reveal">
           <details>
             <summary>Where can I buy the books?</summary>
-            <p>All four books are published on Amazon through Kindle Direct Publishing. Click "Buy on Amazon" on any book to see the available formats and price in your country.</p>
+            <p>All five books are published on Amazon through Kindle Direct Publishing. Click "Buy on Amazon" on any book to see the available formats and price in your country.</p>
           </details>
           <details>
-            <summary>I'm a junior developer. Are these too advanced?</summary>
-            <p>No. Every book is written to take you from junior to senior, so it starts with the fundamentals and builds up to the questions asked in senior interviews.</p>
+            <summary>I'm a junior developer. Are the interview books too advanced?</summary>
+            <p>No. Every interview book is written to take you from junior to senior, so it starts with the fundamentals and builds up to the questions asked in senior interviews.</p>
           </details>
           <details>
             <summary>Which book should I read first?</summary>
-            <p>Start with <strong>Kotlin</strong> if the language itself still feels shaky, or <strong>Core Android</strong> if you're preparing for your first Android role. Then move to <strong>Coroutines &amp; Flow</strong> and <strong>Jetpack Compose</strong>, which come up in almost every modern Android interview.</p>
+            <p>Start with <strong>Kotlin</strong> if the language itself still feels shaky, or <strong>Core Android</strong> if you're preparing for your first Android role. Then move to <strong>Coroutines &amp; Flow</strong> and <strong>Jetpack Compose</strong>, which come up in almost every modern Android interview. Working on a KMP app with a native iOS UI? Read <strong>SwiftUI for KMP Developers</strong>.</p>
           </details>
           <details>
             <summary>How are the books different from the courses?</summary>
